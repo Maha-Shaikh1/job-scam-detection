@@ -38,7 +38,8 @@ Dataset: *Real or Fake – Fake Job Posting Prediction* (Kaggle, 17,880 job post
 ## How to Run
 1. Install Python 3.8+
 2. Install dependencies: `pip install -r requirements.txt`
-3. Open the project folder in VS Code and open **two terminals**:
+3.3. Open the project folder in VS Code, go into the `job_scam_detection` folder
+   (`cd job_scam_detection`) and open **two terminals**:
 
    **Terminal 1 – Backend (API):**
    `python app.py`
