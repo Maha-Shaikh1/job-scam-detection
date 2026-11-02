@@ -1,0 +1,10 @@
+   flask
+   flask-cors
+   werkzeug
+   scikit-learn
+   pandas
+   numpy
+   reportlab
+   pillow
+   pymupdf
+   easyocr
