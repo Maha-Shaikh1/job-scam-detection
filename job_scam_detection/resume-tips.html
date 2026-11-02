@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Tips | JobShield AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --void:#060d1a;
+  --blue:#1a5aff;
+  --cyan:#00d4ff;
+  --sky:#38bdf8;
+  --border:rgba(0,212,255,0.13);
+  --text:#e8f4ff;
+  --muted:rgba(210,235,255,0.72);
+  --green:#00c97e;
+  --red:#f87171;
+  --amber:#fbbf24;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--void);color:var(--text);overflow-x:hidden}
+
+/* ── BG ── */
+#mesh{
+  position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 65% 55% at 0% 5%,rgba(26,90,255,0.28) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 45% at 95% 18%,rgba(0,212,255,0.16) 0%,transparent 55%),
+    radial-gradient(ellipse 55% 50% at 45% 100%,rgba(26,90,255,0.18) 0%,transparent 60%),
+    var(--void);
+  animation:hueShift 20s ease-in-out infinite alternate;
+}
+@keyframes hueShift{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(12deg)}}
+#gridlines{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.016;background-image:linear-gradient(rgba(0,212,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,1) 1px,transparent 1px);background-size:64px 64px}
+canvas#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ── NAVBAR ── */
+.navbar{position:fixed;top:0;width:100%;z-index:200;display:flex;justify-content:space-between;align-items:center;padding:0 60px;height:68px;background:rgba(6,13,26,0.78);backdrop-filter:blur(28px);border-bottom:1px solid var(--border);transition:.4s}
+.navbar.scrolled{background:rgba(6,13,26,0.97);box-shadow:0 8px 40px rgba(0,212,255,0.07)}
+.logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:900;display:flex;align-items:center;gap:9px;text-decoration:none;color:white}
+.logo-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px rgba(0,212,255,.38)}
+.logo span{background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-links a{color:rgba(220,240,255,.82);text-decoration:none;font-size:13.5px;font-weight:500;padding:6px 14px;border-radius:8px;transition:.22s}
+.nav-links a:hover{color:white;background:rgba(0,212,255,0.08)}
+.nav-links a.active{color:var(--cyan)}
+.nav-cta{padding:8px 22px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--cyan));color:white;font-weight:600;font-size:13.5px;box-shadow:0 0 22px rgba(0,212,255,.3);transition:.3s;text-decoration:none}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 28px rgba(0,212,255,.5)}
+
+/* ── CONTAINER ── */
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:110px 40px 80px}
+
+/* ── HERO ── */
+.hero{text-align:center;margin-bottom:72px;opacity:0;animation:rise .8s .1s ease forwards}
+.hero-tag{display:inline-flex;align-items:center;gap:10px;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);margin-bottom:20px}
+.hero-tag::before,.hero-tag::after{content:"";width:24px;height:1.5px;background:var(--cyan);border-radius:2px}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(38px,6vw,68px);font-weight:900;line-height:.92;letter-spacing:-3px;margin-bottom:20px}
+.hero h1 .hw{display:block;color:white}
+.hero h1 .hg{display:block;background:linear-gradient(100deg,var(--blue),var(--cyan),var(--sky),#fff);background-size:250%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 5s linear infinite}
+@keyframes shimmer{0%{background-position:0%}100%{background-position:200%}}
+.hero p{font-size:16px;color:var(--muted);max-width:560px;margin:0 auto;line-height:1.8}
+
+/* ── SECTION HEADER ── */
+.sec-head{margin-bottom:32px}
+.sec-tag{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block;margin-bottom:10px}
+.sec-head h2{font-family:'Syne',sans-serif;font-size:clamp(22px,3vw,32px);font-weight:800;letter-spacing:-1px}
+
+/* ── TIPS BENTO GRID ── */
+.tips-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;margin-bottom:72px;
+}
+@media(max-width:860px){.tips-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.tips-grid{grid-template-columns:1fr}}
+
+.tip-card{
+  background:rgba(8,18,38,0.9);border:1px solid var(--border);
+  border-radius:20px;padding:28px;
+  backdrop-filter:blur(18px);position:relative;overflow:hidden;
+  transition:.4s cubic-bezier(.16,1,.3,1);
+  opacity:0;transform:translateY(28px);
+}
+.tip-card.show{opacity:1;transform:translateY(0)}
+.tip-card:hover{transform:translateY(-6px);border-color:rgba(0,212,255,.35);box-shadow:0 20px 50px rgba(0,212,255,.12)}
+.tip-card::before{content:"";position:absolute;top:-50px;right:-50px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,.07),transparent 70%);pointer-events:none}
+
+.tip-emoji{font-size:28px;margin-bottom:14px;display:block}
+.tip-card h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:8px;color:white;letter-spacing:-.2px}
+.tip-card p{font-size:13.5px;color:rgba(220,240,255,0.88);line-height:1.75}
+.tip-badge{display:inline-block;margin-top:14px;padding:3px 11px;border-radius:7px;font-size:10.5px;font-weight:700;letter-spacing:.5px}
+.badge-tip{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:var(--cyan)}
+.badge-warn{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--red)}
+.badge-safe{background:rgba(0,201,126,.1);border:1px solid rgba(0,201,126,.25);color:var(--green)}
+.badge-new{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);color:var(--amber)}
+
+/* ── DIVIDER ── */
+.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.2),transparent);margin:56px 0}
+
+/* ── DO / DON'T ── */
+.do-dont{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:72px}
+@media(max-width:640px){.do-dont{grid-template-columns:1fr}}
+
+.dd-box{border-radius:20px;padding:30px;backdrop-filter:blur(16px);opacity:0;transform:translateY(24px);transition:.45s}
+.dd-box.show{opacity:1;transform:translateY(0)}
+.dd-do{background:rgba(0,201,126,.05);border:1px solid rgba(0,201,126,.2)}
+.dd-dont{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.2)}
+.dd-box h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:18px}
+.dd-do h3{color:var(--green)}
+.dd-dont h3{color:var(--red)}
+.dd-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;font-size:13.5px;color:var(--muted);line-height:1.6}
+.dd-item .di{flex-shrink:0;margin-top:1px}
+
+/* ── SCORE SIMULATOR ── */
+.score-section{margin-bottom:72px}
+.score-card{
+  background:rgba(8,18,38,0.9);border:1px solid var(--border);
+  border-radius:22px;padding:44px;backdrop-filter:blur(18px);
+  opacity:0;transform:translateY(24px);transition:.5s;
+}
+.score-card.show{opacity:1;transform:translateY(0)}
+
+.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+@media(max-width:640px){.score-grid{grid-template-columns:1fr}}
+
+.q-field{display:flex;flex-direction:column;gap:7px}
+.q-field label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--cyan)}
+.q-field select{
+  background:rgba(6,13,26,.9);border:1px solid var(--border);border-radius:11px;
+  padding:12px 16px;color:var(--text);font-family:'DM Sans';font-size:13.5px;
+  outline:none;transition:.3s;appearance:none;cursor:pointer;
+}
+.q-field select:focus{border-color:rgba(0,212,255,.5);box-shadow:0 0 0 3px rgba(0,212,255,.07)}
+.q-field select option{background:#0a1628}
+
+.calc-btn{
+  padding:13px 32px;border-radius:13px;border:none;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  color:white;font-weight:700;font-size:15px;
+  cursor:pointer;font-family:'DM Sans';
+  box-shadow:0 0 28px rgba(0,212,255,.35);transition:.35s;
+  position:relative;overflow:hidden;
+}
+.calc-btn::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,var(--cyan),var(--blue));opacity:0;transition:.35s}
+.calc-btn:hover::before{opacity:1}
+.calc-btn:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(0,212,255,.6)}
+.calc-btn span{position:relative;z-index:1}
+
+/* result */
+.score-result{display:none;margin-top:32px;padding-top:28px;border-top:1px solid var(--border)}
+.result-top{display:flex;align-items:center;gap:28px;margin-bottom:20px;flex-wrap:wrap}
+.big-score{font-family:'Syne',sans-serif;font-size:64px;font-weight:900;line-height:1;flex-shrink:0}
+.result-text h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:6px}
+.result-text p{font-size:13.5px;color:var(--muted);line-height:1.7;max-width:480px}
+.score-bar-wrap{height:8px;background:rgba(255,255,255,.06);border-radius:20px;overflow:hidden;margin-bottom:20px}
+.score-bar-fill{height:100%;width:0%;border-radius:20px;transition:width 1.4s cubic-bezier(.16,1,.3,1)}
+.fix-list{display:flex;flex-direction:column;gap:8px}
+.fix-item{font-size:13px;padding:10px 14px;border-radius:10px;line-height:1.6}
+.fix-warn{background:rgba(251,191,36,.08);border-left:3px solid var(--amber);color:#fde68a}
+.fix-danger{background:rgba(248,113,113,.08);border-left:3px solid var(--red);color:#fca5a5}
+.fix-good{background:rgba(0,201,126,.08);border-left:3px solid var(--green);color:#6ee7b7}
+
+/* ── ALERT BANNER ── */
+.alert-banner{
+  background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.3);
+  border-radius:20px;padding:28px 32px;margin-bottom:72px;
+  display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;position:relative;overflow:hidden;
+  opacity:0;transform:translateY(20px);transition:.5s;
+}
+.alert-banner.show{opacity:1;transform:translateY(0)}
+.alert-banner::before{content:"";position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,transparent,var(--amber),#f97316,var(--amber),transparent);border-radius:20px 20px 0 0}
+.ab-text p strong{color:var(--amber);font-weight:700}
+.ab-icon{width:48px;height:48px;border-radius:14px;flex-shrink:0;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.28);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.ab-text h4{font-family:"Syne",sans-serif;font-size:17px;font-weight:800;color:var(--amber);margin-bottom:8px;letter-spacing:-.2px}
+.ab-text p{font-size:14px;color:rgba(253,230,138,.9);line-height:1.78}
+
+/* ── FOOTER ── */
+.footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:24px 60px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-logo{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px;text-decoration:none;color:white}
+.footer-icon{width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:11px}
+.footer-logo span{background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.footer-copy{font-size:12px;color:rgba(255,255,255,.2)}
+
+.back-link{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--cyan));color:white;font-weight:700;font-size:14.5px;text-decoration:none;box-shadow:0 0 28px rgba(0,212,255,.35);transition:.35s}
+.back-link:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(0,212,255,.6)}
+
+@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+
+</style>
+</head>
+<body>
+
+<div id="mesh"></div>
+<div id="gridlines"></div>
+<canvas id="stars"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="logo">
+    <div class="logo-icon">🛡</div>
+    Job<span>Shield</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="feature.html">Features</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="guidelines.html">Safety Guide</a>
+    <a href="resume-tips.html" class="active">Resume Tips</a>
+  </div>
+  <a href="login.html" class="nav-cta">Login →</a>
+</nav>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">New Edition</div>
+    <h1>
+      <span class="hw">Resume Tips &</span>
+      <span class="hg">Safety Guide</span>
+    </h1>
+    <p>Apply smarter AI-powered scams are evolving — learn how to write a scam-proof resume, spot deepfake recruiters, and protect your data.</p>
+  </div>
+
+  <!-- ALERT BANNER -->
+  <div class="alert-banner" id="alertBanner">
+    <div class="ab-icon">⚡</div>
+    <div class="ab-text">
+      <h4>Watch Out — Job Scams Got Smarter !</h4>
+      <p>Fraudsters today don't just post fake jobs — they use AI to write convincing descriptions, run deepfake video interviews, and build replica company websites that look 100% real. A LinkedIn badge or a company logo means nothing anymore. Before you send your resume or sign anything, verify the company on <strong>mca.gov.in</strong> and call their official HR number directly.</p>
+    </div>
+  </div>
+
+  <!-- TIPS GRID -->
+  <div class="sec-head">
+    <span class="sec-tag">Smart Resume Tips</span>
+    <h2>💡 What You Need To Know</h2>
+  </div>
+
+  <div class="tips-grid">
+
+    <div class="tip-card">
+      <span class="tip-emoji">📧</span>
+      <h3>Use a Professional Email</h3>
+      <p>Use <strong>firstname.lastname@gmail.com</strong>. Avoid nicknames. scammers also target unprofessional-looking profiles on job portals to pitch fake "exclusive opportunities."</p>
+      <span class="tip-badge badge-tip">Pro Tip</span>
+    </div>
+
+    <div class="tip-card">
+      <span class="tip-emoji">🔒</span>
+      <h3>Never Put Aadhaar on Resume</h3>
+      <p>Never include Aadhaar, PAN, DOB, or home address.data brokers scrape job portals and sell this info. Identity theft cases from resume data have tripled since 2023.</p>
+      <span class="tip-badge badge-warn">Scam Risk</span>
+    </div>
+
+    <div class="tip-card">
+      <span class="tip-emoji">🤖</span>
+      <h3>Beware of AI Deepfake Interviews</h3>
+      <p>Scammers conduct fake video interviews using AI-generated faces. If a recruiter's video looks slightly "off" or robotic — end the call and verify through official HR email.</p>
+      <span class="tip-badge badge-warn">Alert</span>
+    </div>
+
+    <div class="tip-card">
+      <span class="tip-emoji">🔗</span>
+      <h3>Add LinkedIn & GitHub</h3>
+      <p>A verified LinkedIn profile adds credibility. real companies run background checks via LinkedIn. GitHub shows actual work — critical for tech roles.</p>
+      <span class="tip-badge badge-safe">Adds Credibility</span>
+    </div>
+
+    <div class="tip-card">
+      <span class="tip-emoji">📍</span>
+      <h3>City Only, Not Full Address</h3>
+      <p>Write "Mumbai, Maharashtra" — never your full home address. Sharing complete addresses is a serious privacy risk and serves zero legitimate recruitment purpose.</p>
+      <span class="tip-badge badge-tip">Privacy</span>
+    </div>
+
+    <div class="tip-card">
+      <span class="tip-emoji">🎯</span>
+      <h3>Tailor Resume for Each Role</h3>
+      <p>Match keywords from job descriptions for ATS systems. if a job accepts your generic resume too fast — that's a red flag. Real ATS filters take time.</p>
+      <span class="tip-badge badge-tip">ATS Friendly</span>
+    </div>
+
+    <div class="tip-card">
+      <span class="tip-emoji">📸</span>
+      <h3>Be Careful With Photos</h3>
+      <p>Avoid photos on online applications. scammers use AI face-swap tools to create fake profiles using your photo. Only include if required by a verified company.</p>
+      <span class="tip-badge badge-warn">Scam Risk</span>
+    </div>
+
+    <div class="tip-card">
+      <span class="tip-emoji">🧾</span>
+      <h3>Watermark Your Resume PDF</h3>
+      <p>Add a watermark like "Sent to [Company] on [Date]" before sending to unknown companies. Discourages misuse and helps you track where your resume went.</p>
+      <span class="tip-badge badge-safe">Smart Move</span>
+    </div>
+
+    <div class="tip-card">
+      <span class="tip-emoji">🌐</span>
+      <h3>Verify Company on MCA + LinkedIn</h3>
+      <p>Before applying, check the company on <strong>mca.gov.in</strong> and LinkedIn. scammers clone entire company websites with fake CIN numbers — always cross-verify both sources.</p>
+      <span class="tip-badge badge-new">Updated</span>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- DO / DON'T -->
+  <div class="sec-head">
+    <span class="sec-tag">Best Practices</span>
+    <h2>✅ Do's & 🚫 Don'ts</h2>
+  </div>
+
+  <div class="do-dont">
+    <div class="dd-box dd-do">
+      <h3>✅ Do This</h3>
+      <div class="dd-item"><span class="di">✅</span>Use a clean, single-column format that ATS systems can read easily</div>
+      <div class="dd-item"><span class="di">✅</span>Quantify achievements — "Increased sales by 30%" beats "Improved sales"</div>
+      <div class="dd-item"><span class="di">✅</span>Proofread twice — spelling errors signal carelessness to real HRs</div>
+      <div class="dd-item"><span class="di">✅</span>Save as PDF to preserve formatting across all devices</div>
+      <div class="dd-item"><span class="di">✅</span>Research the company on MCA21 before sending your resume</div>
+      <div class="dd-item"><span class="di">✅</span>Follow up via official company email after applying</div>
+      <div class="dd-item"><span class="di">✅</span>Use JobShield AI to scan offer letters before accepting</div>
+    </div>
+    <div class="dd-box dd-dont">
+      <h3>🚫 Don't Do This</h3>
+      <div class="dd-item"><span class="di">🚫</span>Don't include religion, caste, or marital status</div>
+      <div class="dd-item"><span class="di">🚫</span>Don't use tables or graphics — ATS bots can't read them</div>
+      <div class="dd-item"><span class="di">🚫</span>Don't lie about skills — companies verify everything</div>
+      <div class="dd-item"><span class="di">🚫</span>Don't send resume to unknown WhatsApp or Telegram numbers</div>
+      <div class="dd-item"><span class="di">🚫</span>Don't join video interviews without verifying the recruiter's identity</div>
+      <div class="dd-item"><span class="di">🚫</span>Don't pay any "registration", "kit", or "training" fee — ever</div>
+      <div class="dd-item"><span class="di">🚫</span>Don't ignore gut feeling — if something feels off, it probably is</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SCORE SIMULATOR -->
+  <div class="score-section">
+    <div class="sec-head">
+      <span class="sec-tag">Check Yourself</span>
+      <h2>🎯 Resume Safety Score</h2>
+    </div>
+
+    <div class="score-card" id="scoreCard">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.7">Answer 5 quick questions to get your personalized job safety score</p>
+
+      <div class="score-grid">
+
+        <div class="q-field">
+          <label>Where are you applying?</label>
+          <select id="q1">
+            <option value="">— Select —</option>
+            <option value="3">LinkedIn / Naukri / Indeed / Company website</option>
+            <option value="1">WhatsApp groups or Telegram channels</option>
+            <option value="2">Unknown portals or forwarded links</option>
+            <option value="2">Mix of official and unofficial sources</option>
+          </select>
+        </div>
+
+        <div class="q-field">
+          <label>Shared Aadhaar / PAN with recruiter?</label>
+          <select id="q2">
+            <option value="">— Select —</option>
+            <option value="3">No, never during recruitment</option>
+            <option value="1">Yes, before getting an offer letter</option>
+            <option value="2">Only after verified formal offer</option>
+          </select>
+        </div>
+
+        <div class="q-field">
+          <label>Did any recruiter ask for money?</label>
+          <select id="q3">
+            <option value="">— Select —</option>
+            <option value="3">No, never</option>
+            <option value="0">Yes, and I paid</option>
+            <option value="1">Yes, but I refused</option>
+          </select>
+        </div>
+
+        <div class="q-field">
+          <label>Do you verify companies before applying?</label>
+          <select id="q4">
+            <option value="">— Select —</option>
+            <option value="3">Yes — MCA21, LinkedIn & Glassdoor every time</option>
+            <option value="2">Sometimes, if it looks suspicious</option>
+            <option value="1">Rarely — I trust the posting</option>
+            <option value="0">Never checked</option>
+          </select>
+        </div>
+
+        <div class="q-field">
+          <label>Recruiter's contact email?</label>
+          <select id="q5">
+            <option value="">— Select —</option>
+            <option value="3">Official domain (e.g. @tcs.com, @infosys.com)</option>
+            <option value="1">Gmail or Yahoo only</option>
+            <option value="2">Mix of official and personal</option>
+            <option value="0">WhatsApp only, no email</option>
+          </select>
+        </div>
+
+        <div class="q-field">
+          <label>Have you attended a video interview ?</label>
+          <select id="q6">
+            <option value="">— Select —</option>
+            <option value="3">Yes, verified the recruiter's identity beforehand</option>
+            <option value="1">Yes, but didn't verify — it looked real</option>
+            <option value="3">No video interviews yet</option>
+          </select>
+        </div>
+
+      </div>
+
+      <button class="calc-btn" onclick="calcScore()"><span>🎯 Get My Safety Score</span></button>
+
+      <div class="score-result" id="scoreResult">
+        <div class="result-top">
+          <div class="big-score" id="bigScore"></div>
+          <div class="result-text">
+            <h3 id="scoreLabel"></h3>
+            <p id="scoreFeedback"></p>
+          </div>
+        </div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-fill" id="scoreBar"></div>
+        </div>
+        <div class="fix-list" id="fixList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BACK -->
+  <div style="text-align:center;margin-bottom:20px">
+    <a href="index.html" class="back-link">← Back to Home</a>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <a href="index.html" class="footer-logo">
+    <div class="footer-icon">🛡</div>
+    Job<span>Shield</span>
+  </a>
+  <div class="footer-copy">© 2026 JobShield AI — Stay Smart, Stay Safe</div>
+</footer>
+
+<script>
+/* STARS */
+const canvas=document.getElementById("stars"),ctx=canvas.getContext("2d");
+let stars=[];
+function resize(){
+  canvas.width=innerWidth;canvas.height=innerHeight;stars=[];
+  const n=Math.floor(innerWidth*innerHeight/5500);
+  for(let i=0;i<n;i++){
+    const r=Math.random();
+    stars.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.4+.1,a:Math.random(),d:(Math.random()*.005+.002)*(Math.random()<.5?1:-1),c:r<.2?"#00d4ff":r<.38?"#1a5aff":r<.48?"#38bdf8":"#ffffff"});
+  }
+}
+resize();addEventListener("resize",resize);
+(function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(const s of stars){
+    s.a=Math.max(.03,Math.min(1,s.a+s.d));if(s.a<=.03||s.a>=1)s.d*=-1;
+    ctx.save();ctx.globalAlpha=s.a;
+    if(s.r>1){ctx.shadowBlur=s.r*5;ctx.shadowColor=s.c}
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=s.c;ctx.fill();ctx.restore();
+  }
+  requestAnimationFrame(draw);
+})();
+
+/* NAVBAR */
+addEventListener("scroll",()=>document.getElementById("navbar").classList.toggle("scrolled",scrollY>50));
+
+/* SCROLL REVEAL */
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting) setTimeout(()=>e.target.classList.add("show"),+e.target.dataset.delay||0);
+  });
+},{threshold:.1});
+
+document.querySelectorAll(".tip-card").forEach((el,i)=>{el.dataset.delay=i*70;obs.observe(el)});
+document.querySelectorAll(".dd-box,.score-card,.alert-banner").forEach(el=>obs.observe(el));
+
+/* SCORE SIMULATOR */
+function calcScore(){
+  const ids=["q1","q2","q3","q4","q5","q6"];
+  const vals=ids.map(id=>{
+    const v=document.getElementById(id).value;
+    return v===""?null:parseInt(v);
+  });
+  if(vals.includes(null)){
+    // highlight empty
+    ids.forEach((id,i)=>{
+      const el=document.getElementById(id);
+      if(vals[i]===null) el.style.borderColor="rgba(248,113,113,.6)";
+      else el.style.borderColor="";
+    });
+    return;
+  }
+  ids.forEach(id=>document.getElementById(id).style.borderColor="");
+
+  const total=vals.reduce((a,b)=>a+b,0);
+  const max=18;
+  const pct=Math.round((total/max)*100);
+
+  const fixes=[];
+  if(vals[0]<3) fixes.push({t:"warn",m:"⚠️ Apply only on verified platforms like LinkedIn, Naukri, or official company sites."});
+  if(vals[1]<3) fixes.push({t:"warn",m:"⚠️ Never share Aadhaar/PAN before receiving a formal, verified offer letter."});
+  if(vals[2]===0) fixes.push({t:"danger",m:"🚨 You paid a scammer. Report immediately at cybercrime.gov.in or call 1930."});
+  if(vals[2]===1) fixes.push({t:"good",m:"✅ Good — you refused to pay. Consider reporting the recruiter too."});
+  if(vals[3]<3) fixes.push({t:"warn",m:"⚠️ Always verify companies on MCA21 (mca.gov.in) and LinkedIn before applying."});
+  if(vals[4]<3) fixes.push({t:"warn",m:"⚠️ Only trust recruiters with official company email domains — not Gmail or Yahoo."});
+  if(vals[5]===1) fixes.push({t:"danger",m:"🚨 AI deepfake interviews are common. Always verify recruiter identity before joining a video call."});
+
+  let label,feedback,color;
+  if(pct>=85){
+    label="🛡 Excellent — Very Safe";color="#00c97e";
+    feedback="You follow almost all safety practices. Keep verifying companies and never share sensitive documents upfront. You're well-protected against the job scams.";
+  } else if(pct>=65){
+    label="👍 Good — Minor Gaps";color="#00d4ff";
+    feedback="You're fairly safe but have a few habits scammers could exploit. Review the suggestions below and apply them in your next job search.";
+  } else if(pct>=40){
+    label="⚠️ Moderate Risk";color="#fbbf24";
+    feedback="You have several habits that put you at risk. Read the safety guidelines carefully and fix the issues below before applying to more jobs.";
+  } else {
+    label="🚨 High Risk — Act Now";color="#f87171";
+    feedback="Your current practices are seriously risky. If you've already paid someone or shared personal documents, report it at cybercrime.gov.in or call 1930 immediately.";
+  }
+
+  const bigScore=document.getElementById("bigScore");
+  bigScore.textContent=pct+"%";
+  bigScore.style.background=`linear-gradient(135deg,${color},#fff)`;
+  bigScore.style.webkitBackgroundClip="text";
+  bigScore.style.webkitTextFillColor="transparent";
+
+  document.getElementById("scoreLabel").textContent=label;
+  document.getElementById("scoreFeedback").textContent=feedback;
+
+  const bar=document.getElementById("scoreBar");
+  bar.style.background=`linear-gradient(90deg,${color},var(--cyan))`;
+  bar.style.width="0%";
+  setTimeout(()=>bar.style.width=pct+"%",100);
+
+  const fixList=document.getElementById("fixList");
+  fixList.innerHTML=fixes.map(f=>`<div class="fix-item fix-${f.t}">${f.m}</div>`).join("");
+
+  const result=document.getElementById("scoreResult");
+  result.style.display="block";
+  setTimeout(()=>result.scrollIntoView({behavior:"smooth",block:"nearest"}),200);
+}
+</script>
+</body>
+</html>

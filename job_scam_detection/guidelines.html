@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JobShield | Safety Guidelines</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'DM Sans',sans-serif;}
+
+body{
+  background:#0a1628;
+  color:white;
+  overflow-x:hidden;
+}
+
+/* ===== NAVBAR ===== */
+.navbar{
+  position:fixed;
+  top:0;
+  width:100%;
+  height:70px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 60px;
+  background:rgba(8,18,38,0.85);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(0,224,255,0.15);
+  z-index:5;
+}
+
+.logo{
+  font-size:22px;
+  font-weight:700;
+  background:linear-gradient(90deg,#0066ff,#00e0ff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.nav-links a{
+  color:white;
+  text-decoration:none;
+  margin-left:25px;
+  font-size:15px;
+  transition:0.3s;
+}
+
+.nav-links a:hover{ color:#0066ff; }
+
+/* ===== STAR BACKGROUND ===== */
+#starCanvas{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+}
+
+/* ===== MAIN ===== */
+.container{
+  position:relative;
+  z-index:1;
+  max-width:1200px;
+  margin:auto;
+  padding:120px 20px 70px;
+  text-align:center;
+}
+
+h1{
+  font-size:38px;
+  margin-bottom:10px;
+  background:linear-gradient(90deg,#0066ff,#00e0ff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+  color:rgba(255,255,255,0.45);
+  margin-bottom:40px;
+}
+
+.hero{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:40px;
+  flex-wrap:wrap;
+  margin-bottom:60px;
+}
+
+.hero-text{
+  max-width:500px;
+  text-align:left;
+}
+
+.hero-text h2{
+  font-size:26px;
+  margin-bottom:12px;
+}
+
+.hero-text p{
+  color:rgba(255,255,255,0.6);
+  line-height:1.6;
+}
+
+/* ===== SECTION TITLE ===== */
+.section-title{
+  font-size:24px;
+  font-weight:700;
+  margin-bottom:24px;
+  background:linear-gradient(90deg,#0066ff,#00e0ff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-align:center;
+}
+
+/* ===== GRID ===== */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:25px;
+  align-items:stretch;
+}
+
+/* ===== CARD ===== */
+.card{
+  background:rgba(10,22,50,0.85);
+  backdrop-filter:blur(15px);
+  border-radius:18px;
+  padding:25px;
+  border:1px solid rgba(0,224,255,0.12);
+  transition:.4s;
+  opacity:0;
+  transform:translateY(40px);
+}
+
+.card.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.card:hover{ color:white;
+  transform:translateY(-8px) scale(1.02);
+  box-shadow:
+    0 0 25px rgba(0,224,255,0.25),
+    0 0 60px rgba(0,102,255,0.15);
+  border-color:#0066ff;
+}
+
+.icon{
+  font-size:34px;
+  margin-bottom:12px;
+}
+
+.card h3{ margin-bottom:10px; }
+
+.card p{
+  font-size:14px;
+  color:rgba(255,255,255,0.6);
+  line-height:1.6;
+}
+
+/* ===== DIVIDER ===== */
+.divider{
+  width:100%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,224,255,0.3),transparent);
+  margin:60px 0;
+}
+
+/* ===== REPORTING SECTION ===== */
+.report-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+  margin-bottom:20px;
+}
+
+.report-card{
+  background:rgba(10,22,50,0.85);
+  border:1px solid rgba(0,224,255,0.15);
+  border-radius:16px;
+  padding:22px 20px;
+  text-align:left;
+  opacity:0;
+  transform:translateY(30px);
+  transition:.4s;
+}
+
+.report-card.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.report-card:hover{
+  border-color:#00e0ff;
+  box-shadow:0 0 22px rgba(0,224,255,0.15);
+  transform:translateY(-4px);
+}
+
+.report-card-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.report-icon{
+  font-size:28px;
+}
+
+.report-card h3{
+  font-size:15px;
+  font-weight:700;
+  color:#0066ff;
+}
+
+.report-card p{
+  font-size:13px;
+  color:rgba(255,255,255,0.6);
+  line-height:1.6;
+  margin-bottom:14px;
+}
+
+.report-btn{
+  display:inline-block;
+  padding:8px 18px;
+  background:linear-gradient(135deg,#0066ff,#00e0ff);
+  color:white;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:600;
+  text-decoration:none;
+  transition:.25s;
+  border:none;
+  cursor:pointer;
+  font-family:'DM Sans';
+}
+
+.report-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 16px rgba(0,224,255,0.4);
+}
+
+.report-note{
+  margin-top:16px;
+  padding:14px 20px;
+  background:rgba(255,200,0,0.06);
+  border:1px solid rgba(255,200,0,0.2);
+  border-radius:12px;
+  font-size:13px;
+  color:#ffd966;
+  line-height:1.6;
+  text-align:left;
+}
+
+/* ===== QUIZ SECTION ===== */
+.quiz-wrap{
+  background:rgba(10,22,50,0.4);
+  border:1px solid rgba(0,224,255,0.15);
+  border-radius:20px;
+  padding:32px;
+  max-width:740px;
+  margin:0 auto;
+  text-align:left;
+  opacity:0;
+  transform:translateY(30px);
+  transition:.5s;
+}
+
+.quiz-wrap.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.quiz-progress-wrap{
+  width:100%;
+  height:5px;
+  background:rgba(0,224,255,0.1);
+  border-radius:10px;
+  margin-bottom:28px;
+  overflow:hidden;
+}
+
+.quiz-progress-bar{
+  height:100%;
+  background:linear-gradient(90deg,#0066ff,#00e0ff);
+  border-radius:10px;
+  transition:width 0.5s ease;
+  width:0%;
+}
+
+.quiz-q-num{
+  font-size:11px;
+  color:rgba(255,255,255,0.35);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.quiz-question{
+  font-size:17px;
+  font-weight:600;
+  margin-bottom:22px;
+  line-height:1.5;
+  color:white;
+  min-height:52px;
+}
+
+.quiz-options{
+  display:flex;
+  flex-direction:column;
+  gap:11px;
+  margin-bottom:22px;
+}
+
+.quiz-opt{
+  padding:13px 18px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:rgba(10,22,50,0.85);
+  cursor:pointer;
+  font-size:14px;
+  color:rgba(255,255,255,0.6);
+  transition:.25s;
+  font-family:'DM Sans';
+  text-align:left;
+  width:100%;
+}
+
+.quiz-opt:hover:not(:disabled){
+  border-color:#0066ff;
+  background:rgba(0,224,255,0.07);
+  color:white;
+}
+
+.quiz-opt.correct{
+  border-color:#00c97e;
+  background:rgba(0,224,255,0.1);
+  color:#00ff99;
+}
+
+.quiz-opt.wrong{
+  border-color:#ff4d4d;
+  background:rgba(255,77,77,0.08);
+  color:#ff7070;
+}
+
+.quiz-opt:disabled{
+  cursor:default;
+}
+
+.quiz-feedback{
+  min-height:36px;
+  font-size:13px;
+  line-height:1.55;
+  margin-bottom:16px;
+  padding:10px 14px;
+  border-radius:10px;
+  display:none;
+}
+
+.quiz-feedback.show{ display:block; }
+
+.quiz-feedback.correct-fb{
+  background:rgba(0,224,255,0.08);
+  border:1px solid rgba(0,224,255,0.25);
+  color:#00d97e;
+}
+
+.quiz-feedback.wrong-fb{
+  background:rgba(255,77,77,0.07);
+  border:1px solid rgba(255,77,77,0.25);
+  color:#ff8080;
+}
+
+.quiz-next-btn{
+  display:none;
+  padding:10px 24px;
+  background:linear-gradient(135deg,#0066ff,#00e0ff);
+  color:white;
+  border:none;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.25s;
+  font-family:'DM Sans';
+}
+
+.quiz-next-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 16px rgba(0,224,255,0.4);
+}
+
+/* ===== RESULT SCREEN ===== */
+.quiz-result{
+  display:none;
+  text-align:center;
+  padding:10px 0;
+}
+
+.quiz-result-score{
+  font-size:52px;
+  font-weight:700;
+  background:linear-gradient(90deg,#0066ff,#00e0ff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:6px;
+}
+
+.quiz-result-label{
+  font-size:17px;
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+.quiz-result-msg{
+  font-size:13.5px;
+  color:rgba(255,255,255,0.6);
+  line-height:1.6;
+  margin-bottom:22px;
+}
+
+.quiz-restart-btn{
+  padding:10px 26px;
+  background:linear-gradient(135deg,#0066ff,#00e0ff);
+  color:white;
+  border:none;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.25s;
+  font-family:'DM Sans';
+}
+
+.quiz-restart-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 16px rgba(0,224,255,0.4);
+}
+
+/* ===== BACK BUTTON ===== */
+.back-btn{
+  margin-top:50px;
+  padding:12px 28px;
+  border:none;
+  border-radius:30px;
+  background:linear-gradient(90deg,#0066ff,#00e0ff);
+  color:white;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.3s;
+  font-family:'DM Sans';
+}
+
+.back-btn:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 20px rgba(0,224,255,0.4);
+}
+
+.footer{
+  margin-top:60px;
+  color:rgba(255,255,255,0.45);
+  font-size:13px;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="starCanvas"></canvas>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="logo">JobShield AI</div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="guidelines.html">Safety Guide</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <h1>🛡 Job Safety Guidelines</h1>
+  <div class="subtitle">Learn how to stay safe from job scams</div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <lottie-player
+      src="https://assets7.lottiefiles.com/packages/lf20_jtbfg2nb.json"
+      background="transparent"
+      speed="1"
+      style="width:280px;height:280px;"
+      loop autoplay>
+    </lottie-player>
+    <div class="hero-text">
+      <h2>Stay One Step Ahead of Scammers</h2>
+      <p>
+        Job scams are increasing rapidly. Awareness is your strongest protection.
+        Follow these guidelines before applying for any job online.
+      </p>
+    </div>
+  </div>
+
+  <!-- SAFETY TIPS GRID -->
+  <div class="section-title">⚠️ Key Safety Tips</div>
+  <div class="grid">
+    <div class="card"><div class="icon">🚨</div><h3>Never Pay Fees</h3><p>Legitimate companies never charge joining fees, registration, or training costs upfront.</p></div>
+    <div class="card"><div class="icon">📧</div><h3>Check Official Email</h3><p>Real recruiters use company domains. Avoid hiring over Gmail, Yahoo or WhatsApp only.</p></div>
+    <div class="card"><div class="icon">💰</div><h3>Unrealistic Salary</h3><p>Promises of very high income for minimal effort are the most common scam signal.</p></div>
+    <div class="card"><div class="icon">🔎</div><h3>Research Company</h3><p>Verify company on MCA21, LinkedIn, Glassdoor and check registration status before applying.</p></div>
+    <div class="card"><div class="icon">🪪</div><h3>Protect Identity</h3><p>Never share Aadhaar, PAN, bank details, or OTPs during recruitment processes.</p></div>
+    <div class="card"><div class="icon">⏳</div><h3>Avoid Urgency</h3><p>"Limited seats" and "apply in 24 hours" pressure tactics are classic scam red flags.</p></div>
+    <div class="card"><div class="icon">🌐</div><h3>Verify Website</h3><p>Check the official company website, domain age, and HTTPS security before sharing anything.</p></div>
+    <div class="card"><div class="icon">📄</div><h3>Read Job Details Carefully</h3><p>Fake jobs often contain spelling mistakes, vague descriptions, and unrealistic requirements.</p></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- REPORTING SECTION -->
+  <div class="section-title">🚨 Where to Report Job Scams</div>
+
+  <div class="report-grid">
+
+    <div class="report-card">
+      <div class="report-card-header">
+        <div class="report-icon">🖥️</div>
+        <h3>Cybercrime Portal</h3>
+      </div>
+      <p>India's official government portal to report online fraud including job scams, financial fraud, and identity theft.</p>
+      <a class="report-btn" href="https://cybercrime.gov.in" target="_blank">Report at cybercrime.gov.in →</a>
+    </div>
+
+    <div class="report-card">
+      <div class="report-card-header">
+        <div class="report-icon">📞</div>
+        <h3>National Helpline 1930</h3>
+      </div>
+      <p>Call the National Cyber Crime Helpline immediately if you've lost money or shared personal details with a scammer.</p>
+    </div>
+
+    <div class="report-card">
+      <div class="report-card-header">
+        <div class="report-icon">👮</div>
+        <h3>Local Police / FIR</h3>
+      </div>
+      <p>File an FIR at your nearest police station or cyber cell, especially if financial loss has occurred.</p>
+    </div>
+
+    <div class="report-card">
+      <div class="report-card-header">
+        <div class="report-icon">🏦</div>
+        <h3>Report to Your Bank</h3>
+      </div>
+      <p>If you've transferred money, immediately call your bank's fraud helpline to freeze or reverse the transaction.</p>
+    </div>
+
+  </div>
+
+  <div class="report-note">
+    ⚡ <strong>Act Fast!</strong> If you've been scammed, report within 24 hours on <strong>cybercrime.gov.in</strong> or call <strong>1930</strong>. The faster you report, the higher the chance of recovering lost funds.
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- QUIZ SECTION -->
+  <div class="section-title">🧠 Quiz — Is This Job a Scam?</div>
+  <p style="color:rgba(255,255,255,0.45); font-size:14px; margin-bottom:28px;">Test your scam-spotting skills with real-world scenarios!</p>
+
+  <div class="quiz-wrap" id="quizWrap">
+
+    <!-- Progress -->
+    <div class="quiz-progress-wrap">
+      <div class="quiz-progress-bar" id="quizBar"></div>
+    </div>
+
+    <!-- Question screen -->
+    <div id="quizScreen">
+      <div class="quiz-q-num" id="quizQNum">Question 1 of 8</div>
+      <div class="quiz-question" id="quizQ"></div>
+      <div class="quiz-options" id="quizOpts"></div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <button class="quiz-next-btn" id="quizNextBtn" onclick="nextQuestion()">Next →</button>
+    </div>
+
+    <!-- Result screen -->
+    <div class="quiz-result" id="quizResult">
+      <div class="quiz-result-score" id="quizScore"></div>
+      <div class="quiz-result-label" id="quizResultLabel"></div>
+      <div class="quiz-result-msg" id="quizResultMsg"></div>
+      <button class="quiz-restart-btn" onclick="restartQuiz()">🔄 Try Again</button>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <button class="back-btn" onclick="window.location.href='index.html'">← Back to Home</button>
+
+  <div class="footer">
+    © 2026 JobShield AI — Stay Smart, Stay Safe
+  </div>
+
+</div>
+
+<script>
+
+/* ===== STARS ===== */
+const canvas=document.getElementById("starCanvas");
+const ctx=canvas.getContext("2d");
+let stars=[];
+
+function resizeCanvas(){
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  stars=[];
+  for(let i=0;i<130;i++){
+    stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5});
+  }
+}
+resizeCanvas();
+window.addEventListener("resize",resizeCanvas);
+
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#0066ff";
+  stars.forEach(s=>{ ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill(); });
+}
+
+function animate(){
+  stars.forEach(s=>{ s.y+=0.3; if(s.y>canvas.height){ s.y=0; s.x=Math.random()*canvas.width; } });
+  draw(); requestAnimationFrame(animate);
+}
+animate();
+
+/* ===== SCROLL ANIMATIONS ===== */
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{ if(entry.isIntersecting) entry.target.classList.add("show"); });
+},{threshold:0.15});
+document.querySelectorAll(".card,.report-card,.quiz-wrap").forEach(el=>observer.observe(el));
+
+/* ===== ALL QUIZ QUESTIONS POOL (16 total) ===== */
+const allQuestions = [
+  {
+    q: "A recruiter messages you on WhatsApp: 'Urgent! We're hiring for a work-from-home role, ₹40,000/month. No experience needed. Pay ₹2,500 registration fee to start.' Is this a scam?",
+    opts: ["Yes, this is definitely a scam", "No, it sounds like a genuine offer", "Maybe, need more info"],
+    correct: 0,
+    feedback: "🔴 SCAM! Three massive red flags: WhatsApp recruiting, unrealistic salary for no experience, and upfront payment. Legit companies NEVER charge fees."
+  },
+  {
+    q: "You receive an offer letter from 'Amazon HR' via Gmail (amazonsupport.hr@gmail.com) for a remote data entry role paying ₹8,000/day. What do you do?",
+    opts: ["Accept and send your documents", "Verify on Amazon's official website and email only", "Ask them to increase the salary first"],
+    correct: 1,
+    feedback: "✅ Correct! Amazon uses @amazon.com emails only. A Gmail address is a fake. Always verify job offers on the company's official careers page."
+  },
+  {
+    q: "A job posting says: 'Walk-in interview at our Delhi office. Salary ₹25,000–35,000 for fresher. Bring your resume and documents.' Is this suspicious?",
+    opts: ["Yes, walk-in interviews are always fake", "No, this sounds like a normal legitimate job posting", "Only if they ask for money at the interview"],
+    correct: 1,
+    feedback: "✅ Correct! Walk-in interviews at a physical office with reasonable salary expectations are completely normal. The red flag is only if they demand fees or documents like Aadhaar during the interview."
+  },
+  {
+    q: "You get selected for a job and they ask for your Aadhaar number, PAN card, and bank account details to 'process your joining.' What should you do?",
+    opts: ["Share everything — they need it for payroll", "Share only Aadhaar, not PAN", "Refuse — verify through official HR channels first"],
+    correct: 2,
+    feedback: "🔴 Never share sensitive documents without verification! Real companies only ask for documents AFTER formal onboarding — never during selection. Call the company's official number to verify."
+  },
+  {
+    q: "A job ad says: 'Earn ₹50,000/week liking YouTube videos and sharing posts. No skills needed. Limited slots — apply NOW!' What's your call?",
+    opts: ["Scam — unrealistic income and fake urgency", "Legit — social media jobs are real these days", "Maybe — depends on the company name"],
+    correct: 0,
+    feedback: "🔴 SCAM! No legitimate job pays ₹50,000/week for liking videos. The 'limited slots' urgency is a classic pressure tactic scammers use to stop you from thinking critically."
+  },
+  {
+    q: "A company's website looks professional, has an address, and offers a reasonable salary of ₹18,000/month for a data analyst fresher. Is it safe to apply?",
+    opts: ["Yes, fully safe — it looks professional", "Verify the company on MCA21/LinkedIn before applying", "No, all online jobs are fake"],
+    correct: 1,
+    feedback: "✅ Correct! A professional website alone doesn't guarantee legitimacy. Always cross-check on MCA21 company registry, LinkedIn, and Glassdoor before sharing any information."
+  },
+  {
+    q: "You applied for a job and they say: 'You're selected! But first pay ₹500 for your ID card and ₹1,000 for the training kit.' What do you do?",
+    opts: ["Pay — ₹1,500 is not much for a job", "Refuse — this is a scam", "Negotiate to pay less"],
+    correct: 1,
+    feedback: "🔴 SCAM! Any upfront payment demand — no matter how small — is a fraud red flag. Legitimate employers never ask candidates to pay for ID cards, training, or uniforms."
+  },
+  {
+    q: "A recruiter says: 'Your interview is on Zoom. Please send your resume, photo, Class 10 & 12 marksheets, and Aadhaar BEFORE the interview for verification.' Should you comply?",
+    opts: ["Yes — it's just pre-screening", "Share only resume, not ID documents", "Refuse to share ID documents before interview verification"],
+    correct: 2,
+    feedback: "🔴 Danger! Collecting sensitive ID documents before any interview is a data theft tactic. Share your resume only. Documents are requested post-offer via official, verified channels."
+  },
+  {
+    q: "Someone offers you ₹500 per hour to 'review products' from home with no experience. They ask for a ₹999 'security deposit' to get started. What is this?",
+    opts: ["A real work-from-home opportunity", "A scam — security deposits for jobs don't exist", "Depends on how reputed the company is"],
+    correct: 1,
+    feedback: "🔴 SCAM! 'Security deposits' for jobs do not exist. This is a classic advance fee fraud. Once you pay, the job and recruiter both disappear."
+  },
+  {
+    q: "A job offer arrives with the company's logo, a professional PDF offer letter, and salary of ₹22,000/month. But the email is from @infosys-hiring.net. Is it legit?",
+    opts: ["Yes — the letter looks official", "No — Infosys only uses @infosys.com. This domain is fake", "Maybe — reply and ask for more details"],
+    correct: 1,
+    feedback: "🔴 Fake! Scammers create lookalike domains like 'infosys-hiring.net'. Real Infosys emails come from @infosys.com only. Always check the exact domain, not just the logo."
+  },
+  {
+    q: "A recruiter calls and says your resume was shortlisted on Naukri. They conduct a 5-minute phone interview and immediately say you're selected. How do you feel?",
+    opts: ["Excited — congratulations to me!", "Suspicious — real hiring takes multiple rounds", "Normal — phone selections happen all the time"],
+    correct: 1,
+    feedback: "⚠️ Be suspicious! Instant selections after a 5-minute call are a red flag. Real companies have structured interviews. This is often a setup to later demand fees or extract your data."
+  },
+  {
+    q: "A WhatsApp group adds you and posts: 'Daily task: Like 10 posts, earn ₹200 per task. Unlimited tasks available. Join our Telegram for more.' Is this safe?",
+    opts: ["Yes — easy money, why not?", "Scam — this is a task-based fraud scheme", "Only join if your friend referred you"],
+    correct: 1,
+    feedback: "🔴 SCAM! This is a well-known 'task fraud' scheme. After small initial payments to build trust, victims are asked to invest large amounts and then lose everything. Never join such groups."
+  },
+  {
+    q: "You find a job on LinkedIn posted by a 'Senior HR Manager' with 500+ connections and a verified badge. The salary is ₹15,000/month for a content writer. Is this definitely safe?",
+    opts: ["Yes — LinkedIn is always trustworthy", "Mostly safe, but still verify the company independently", "No — LinkedIn jobs are always fake"],
+    correct: 1,
+    feedback: "✅ Right! Even on LinkedIn, fake profiles exist. The salary is realistic, which is a good sign, but always verify the company on its official website and check if the HR profile is genuine."
+  },
+  {
+    q: "After an interview, HR sends you an offer letter asking you to sign and return it, along with a ₹3,000 'background verification fee'. What do you do?",
+    opts: ["Pay — background checks are normal", "Refuse — companies pay for their own background checks", "Ask if you can pay after joining"],
+    correct: 1,
+    feedback: "🔴 SCAM! Companies always pay for background verification themselves — never the candidate. This fee demand after an offer letter is a classic fraud tactic."
+  },
+  {
+    q: "A job description has spelling mistakes, says 'urgant hiring', offers ₹1,20,000/month for a 'data entry boy', and asks to 'contact on WhatsApp only'. How many red flags?",
+    opts: ["None — small mistakes happen", "1–2 red flags, but might be genuine", "Multiple red flags — very likely a scam"],
+    correct: 2,
+    feedback: "🔴 Multiple red flags! Spelling errors, absurd salary for data entry, WhatsApp-only contact, and urgency all together scream SCAM. No legitimate employer communicates like this."
+  },
+  {
+    q: "You get a call: 'Congratulations! You've been selected for a government job. Pay ₹5,000 processing fee to the recruitment board to confirm your seat.' Is this real?",
+    opts: ["Yes — government jobs have processing fees", "No — government recruitments are always free", "Maybe — depends on which department"],
+    correct: 1,
+    feedback: "🔴 100% SCAM! Government job recruitment in India is always free. UPSC, SSC, state PSCs — none charge processing fees by phone. Hang up and report to cybercrime.gov.in."
+  }
+];
+
+/* ===== QUIZ LOGIC ===== */
+let current = 0;
+let score = 0;
+let answered = false;
+let quizQuestions = []; // 8 randomly picked questions for this round
+
+function shuffleArray(arr){
+  // Fisher-Yates shuffle — returns new shuffled array
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickQuestions(){
+  // Pick 8 random questions from the pool of 16
+  quizQuestions = shuffleArray(allQuestions).slice(0, 8);
+}
+
+function loadQuestion(){
+  const q = quizQuestions[current];
+  document.getElementById("quizQNum").innerText = `Question ${current+1} of ${quizQuestions.length}`;
+  document.getElementById("quizQ").innerText = q.q;
+  document.getElementById("quizBar").style.width = ((current / quizQuestions.length) * 100) + "%";
+
+  const optsEl = document.getElementById("quizOpts");
+  optsEl.innerHTML = "";
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "quiz-opt";
+    btn.innerText = opt;
+    btn.onclick = () => selectAnswer(i);
+    optsEl.appendChild(btn);
+  });
+
+  const fb = document.getElementById("quizFeedback");
+  fb.className = "quiz-feedback";
+  fb.innerText = "";
+
+  document.getElementById("quizNextBtn").style.display = "none";
+  answered = false;
+}
+
+function selectAnswer(idx){
+  if(answered) return;
+  answered = true;
+
+  const q = quizQuestions[current];
+  const opts = document.querySelectorAll(".quiz-opt");
+  opts.forEach(o => o.disabled = true);
+
+  const fb = document.getElementById("quizFeedback");
+
+  if(idx === q.correct){
+    opts[idx].classList.add("correct");
+    fb.className = "quiz-feedback correct-fb show";
+    fb.innerText = "✅ " + q.feedback;
+    score++;
+  } else {
+    opts[idx].classList.add("wrong");
+    opts[q.correct].classList.add("correct");
+    fb.className = "quiz-feedback wrong-fb show";
+    fb.innerText = "❌ " + q.feedback;
+  }
+
+  document.getElementById("quizNextBtn").style.display = "inline-block";
+}
+
+function nextQuestion(){
+  current++;
+  if(current >= quizQuestions.length){
+    showResult();
+  } else {
+    loadQuestion();
+  }
+}
+
+function showResult(){
+  document.getElementById("quizBar").style.width = "100%";
+  document.getElementById("quizScreen").style.display = "none";
+  const result = document.getElementById("quizResult");
+  result.style.display = "block";
+
+  document.getElementById("quizScore").innerText = score + "/" + quizQuestions.length;
+
+  let label, msg;
+  if(score === quizQuestions.length){
+    label = "🏆 Perfect Score! You're a Scam Shield!";
+    msg = "Outstanding! You can spot every scam trick. Share this quiz with friends and family to protect them too.";
+  } else if(score >= 6){
+    label = "👍 Great Job! You're Scam-Aware";
+    msg = "You're well protected! Review the questions you missed and stay sharp — scammers are always evolving their tactics.";
+  } else if(score >= 4){
+    label = "⚠️ Fair — Room to Improve";
+    msg = "You know some basics but there are gaps. Please re-read the safety tips above and try again to boost your awareness.";
+  } else {
+    label = "🚨 High Risk — Please Learn Before Applying";
+    msg = "You may be vulnerable to job scams. Please carefully read all the safety guidelines on this page before applying to any online jobs.";
+  }
+
+  document.getElementById("quizResultLabel").innerText = label;
+  document.getElementById("quizResultMsg").innerText = msg;
+}
+
+function restartQuiz(){
+  current = 0;
+  score = 0;
+  answered = false;
+  // Pick a fresh random set of 8 questions — different from last round
+  pickQuestions();
+  document.getElementById("quizScreen").style.display = "block";
+  document.getElementById("quizResult").style.display = "none";
+  loadQuestion();
+}
+
+// Init — pick first set and start
+pickQuestions();
+loadQuestion();
+
+</script>
+</body>
+</html>

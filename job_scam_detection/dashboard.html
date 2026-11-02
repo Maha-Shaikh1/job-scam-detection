@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JobShield AI Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+/* ===== RESET & ROOT ===== */
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+:root {
+  --void:   #0d1f3c;
+  --deep:   #0f1e32;
+  --mid:    #142236;
+  --lift:   #112038;
+  --blue:   #1a5cff;
+  --cyan:   #00d4ff;
+  --green:  #00e096;
+  --red:    #ff4560;
+  --amber:  #ffb800;
+  --white:  #f0f8ff;
+  --sub:    rgba(220,240,255,0.82);
+  --muted:  rgba(160,210,255,0.55);
+  --label:  rgba(100,210,255,0.95);
+  --border: rgba(0,212,255,0.22);
+  --borderb:rgba(0,212,255,0.3);
+  --card:   rgba(13,22,40,0.92);
+  --mono:   'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  color: #f0f8ff;
+  min-height: 100vh;
+  background: var(--void);
+  overflow-x: hidden;
+}
+
+/* ===== ANIMATED BACKGROUND ===== */
+#starCanvas {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+}
+.bg-layer {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 10% 15%,  rgba(26,92,255,0.52) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 50% at 90% 80%,  rgba(0,212,255,0.38) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 35% at 50% 50%,  rgba(0,212,255,0.12) 0%, transparent 65%);
+}
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.09) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 20%, transparent 90%);
+}
+
+/* ===== LAYOUT ===== */
+.container {
+  position: relative; z-index: 1;
+  max-width: 1260px; margin: auto; padding: 20px 24px;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 18px; border-radius: 18px;
+  background: rgba(13,22,40,0.92);
+  backdrop-filter: blur(28px);
+  border: 1px solid var(--border);
+  box-shadow: 0 0 0 1px rgba(0,200,255,0.04), 0 8px 40px rgba(0,0,0,0.5);
+  position: relative; overflow: hidden;
+}
+.navbar::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 5%, rgba(0,212,255,0.5) 50%, transparent 95%);
+}
+
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 900; font-size: 20px; letter-spacing: -0.5px;
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-icon {
+  width: 36px; height: 36px; border-radius: 11px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  box-shadow: 0 0 20px rgba(0,212,255,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.logo-text {
+  background: linear-gradient(90deg, #fff 30%, var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+
+.nav-user {
+  display: flex; align-items: center; gap: 9px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px; padding: 5px 16px 5px 5px;
+}
+.nav-user img {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 2px solid rgba(0,212,255,0.5);
+  box-shadow: 0 0 12px rgba(0,212,255,0.3);
+}
+.nav-username {
+  font-size: 13px; font-weight: 600; color: #f0f8ff;
+}
+
+/* connection status */
+#connStatus {
+  font-size: 11px; font-weight: 700; letter-spacing: .4px;
+  padding: 5px 13px; border-radius: 100px; display: none;
+  background: rgba(255,69,96,0.1); border: 1px solid rgba(255,69,96,0.3); color: #ff8090;
+}
+#connStatus.ok {
+  background: rgba(0,224,150,0.08); border-color: rgba(0,224,150,0.3); color: var(--green);
+}
+#connStatus::before { content: '● '; }
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 20px; border-radius: 11px; border: none;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px;
+  cursor: pointer; transition: all .25s cubic-bezier(.22,1,.36,1);
+  letter-spacing: .2px; white-space: nowrap; position: relative; overflow: hidden;
+}
+.btn::after {
+  content: ''; position: absolute; inset: 0; opacity: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  transition: opacity .2s;
+}
+.btn:hover::after { opacity: 1; }
+
+.btn {
+  background: linear-gradient(135deg, var(--blue) 0%, #0e9bdf 60%, var(--cyan) 100%);
+  color: white;
+  box-shadow: 0 4px 18px rgba(0,212,255,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,212,255,0.45); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-ghost {
+  background: linear-gradient(135deg, var(--blue) 0%, #0e9bdf 60%, var(--cyan) 100%);
+  box-shadow: 0 4px 18px rgba(0,212,255,0.2), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.btn-ghost:hover { box-shadow: 0 8px 28px rgba(0,212,255,0.4); }
+
+/* ===== GRID ===== */
+.grid {
+  display: grid;
+  grid-template-columns: 1.45fr 0.55fr;
+  gap: 18px; margin-top: 18px;
+}
+
+/* ===== CARD ===== */
+.card {
+  position: relative;
+  background: var(--card);
+  backdrop-filter: blur(24px);
+  border-radius: 22px; padding: 24px;
+  border: 1px solid var(--border);
+  box-shadow: 0 0 0 1px rgba(0,200,255,0.03), 0 12px 60px rgba(0,0,0,0.5);
+  overflow: hidden;
+  animation: slideUp .5s cubic-bezier(.22,1,.36,1) both;
+}
+.card:nth-child(2) { animation-delay: .08s; }
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 8%, rgba(0,212,255,0.75) 50%, transparent 92%);
+}
+.card::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(circle at 8% 8%, rgba(0,212,255,0.10), transparent 40%),
+    radial-gradient(circle at 92% 88%, rgba(26,92,255,0.10), transparent 40%);
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px; font-weight: 900; margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px; color: #f0f8ff;
+  position: relative; z-index: 1;
+}
+.card-title .pill {
+  font-size: 9.5px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--cyan); background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.25);
+  padding: 3px 10px; border-radius: 100px;
+}
+
+/* ===== TEXTAREA ===== */
+.textarea-wrap {
+  position: relative; border-radius: 14px; overflow: hidden;
+  border: 1px solid var(--border);
+  background: rgba(4,8,18,0.9);
+  transition: border-color .3s, box-shadow .3s;
+}
+.textarea-wrap:focus-within {
+  border-color: rgba(0,212,255,0.5);
+  box-shadow: 0 0 0 3px rgba(0,212,255,0.08), 0 0 24px rgba(0,212,255,0.12);
+}
+.textarea-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px; border-bottom: 1px solid var(--border);
+  background: rgba(0,212,255,0.03);
+}
+.textarea-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--label); font-family: var(--mono);
+}
+.textarea-hint {
+  font-size: 10.5px; color: var(--muted); font-family: var(--mono);
+}
+
+textarea {
+  width: 100%; height: 195px; padding: 14px 16px;
+  background: transparent; border: none; outline: none; resize: none;
+  color: var(--white); font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px; line-height: 1.7;
+}
+textarea::placeholder { color: rgba(160,210,255,0.32); }
+
+/* ===== UPLOAD ZONE ===== */
+.upload-row { display: flex; gap: 10px; margin-top: 12px; }
+
+.upload-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 9px;
+  padding: 11px 16px; border-radius: 13px; cursor: pointer;
+  border: none; font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: 12.5px; transition: all .28s cubic-bezier(.22,1,.36,1);
+  position: relative; overflow: hidden;
+}
+.upload-btn input { display: none; }
+
+/* Image upload — vivid teal-to-blue */
+.upload-btn.img-btn {
+  background: linear-gradient(135deg, #0066cc 0%, #0099ee 50%, #00ccff 100%);
+  color: white;
+  box-shadow: 0 4px 22px rgba(0,180,255,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
+}
+.upload-btn.img-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 36px rgba(0,180,255,0.55);
+  filter: brightness(1.1);
+}
+
+/* PDF upload — vivid purple-to-magenta */
+.upload-btn.pdf-btn {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #e040fb 100%);
+  color: white;
+  box-shadow: 0 4px 22px rgba(168,85,247,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
+}
+.upload-btn.pdf-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 36px rgba(168,85,247,0.55);
+  filter: brightness(1.1);
+}
+
+.upload-btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+  opacity: 0; transition: opacity .2s;
+}
+.upload-btn:hover::after { opacity: 1; }
+
+.upload-btn .btn-icon {
+  font-size: 16px; flex-shrink: 0;
+}
+.upload-btn .btn-text { line-height: 1.2; }
+.upload-btn .btn-text .top { font-size: 12.5px; font-weight: 800; display: block; }
+.upload-btn .btn-text .sub { font-size: 10px; font-weight: 500; opacity: .8; display: block; margin-top: 1px; font-family: 'DM Sans'; }
+
+.upload-tag {
+  display: none; align-items: center; gap: 8px;
+  margin-top: 10px; padding: 8px 14px; border-radius: 11px;
+  background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.22);
+  font-size: 12px; color: var(--cyan); font-weight: 500;
+  animation: slideUp .3s ease;
+}
+.upload-tag.visible { display: flex; }
+.upload-tag .remove {
+  cursor: pointer; color: rgba(255,255,255,0.35);
+  font-size: 15px; line-height: 1; margin-left: auto; transition: color .2s;
+}
+.upload-tag .remove:hover { color: var(--red); }
+
+/* ===== ACTION ROW ===== */
+.action-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+
+/* ===== SCAN SECTION ===== */
+#scanSection {
+  margin-top: 16px;
+  opacity: 0; visibility: hidden; max-height: 0; overflow: hidden;
+  transition: opacity .3s ease, visibility .3s ease, max-height .45s ease;
+  border-radius: 14px; padding: 0 18px;
+  border: 1px solid rgba(0,212,255,0.12);
+  background: rgba(4,8,16,0.95);
+  position: relative;
+}
+#scanSection::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,212,255,0.4), transparent);
+}
+#scanSection.active {
+  opacity: 1; visibility: visible; max-height: 300px; padding: 18px;
+  animation: fadeUp .3s ease;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.scan-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.spinner-sm {
+  width: 26px; height: 26px; flex-shrink: 0;
+  border: 2.5px solid rgba(0,212,255,0.15);
+  border-top: 2.5px solid var(--cyan);
+  border-radius: 50%; animation: spin .75s linear infinite;
+  box-shadow: 0 0 12px rgba(0,212,255,0.2);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.scan-step-text {
+  font-size: 13px; font-weight: 600; color: var(--cyan);
+  font-family: var(--mono);
+}
+
+.progress-wrap {
+  width: 100%; height: 3px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 10px; overflow: hidden; margin-bottom: 14px;
+}
+.progress-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  border-radius: 10px; transition: width .45s ease;
+  box-shadow: 0 0 8px rgba(0,212,255,0.6);
+}
+
+.checklist { display: flex; flex-wrap: wrap; gap: 7px; }
+.check-item {
+  font-size: 11px; padding: 4px 12px; border-radius: 100px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+  color: rgba(200,230,255,0.3); transition: all .3s; font-family: var(--mono);
+  font-weight: 500;
+}
+.check-item.active {
+  color: var(--cyan); border-color: rgba(0,212,255,0.4);
+  background: rgba(0,212,255,0.09);
+  box-shadow: 0 0 12px rgba(0,212,255,0.15);
+}
+.check-item.done {
+  color: var(--green); border-color: rgba(0,224,150,0.35);
+  background: rgba(0,224,150,0.07);
+}
+
+/* ===== RESULT SECTION ===== */
+#resultSection { margin-top: 16px; display: none; }
+
+/* ===== RESULT CARD ===== */
+.result-card {
+  background: rgba(6,12,22,0.98);
+  border-radius: 16px; padding: 20px 22px;
+  border: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 12px; position: relative; overflow: hidden;
+}
+.result-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,212,255,0.3), transparent);
+}
+
+.result-top-row {
+  display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px;
+}
+.result-pred-block { flex: 1; }
+.result-conf-block { text-align: right; }
+
+.result-label-sm {
+  font-size: 10px; color: var(--muted);
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px;
+  font-family: var(--mono); font-weight: 500;
+}
+.result-pred-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px; font-weight: 900; margin-bottom: 10px; display: block;
+}
+.result-conf-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px; font-weight: 900; margin-bottom: 6px; display: block; text-align: right;
+}
+
+.badge-scam { color: var(--red) !important; text-shadow: 0 0 20px rgba(255,69,96,0.4); }
+.badge-real { color: var(--green) !important; text-shadow: 0 0 20px rgba(0,224,150,0.4); }
+
+.verdict-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 18px; border-radius: 100px;
+  font-size: 12.5px; font-weight: 700; letter-spacing: .3px;
+  font-family: 'Syne', sans-serif;
+}
+.verdict-badge.scam {
+  background: rgba(255,69,96,0.1); border: 1.5px solid rgba(255,69,96,0.45); color: #ff7085;
+  box-shadow: 0 0 18px rgba(255,69,96,0.15);
+}
+.verdict-badge.legit {
+  background: rgba(0,224,150,0.08); border: 1.5px solid rgba(0,224,150,0.4); color: var(--green);
+  box-shadow: 0 0 18px rgba(0,224,150,0.12);
+}
+.verdict-badge.doubtful {
+  background: rgba(255,184,0,0.08); border: 1.5px solid rgba(255,184,0,0.4); color: #ffb800;
+  box-shadow: 0 0 18px rgba(255,184,0,0.12);
+}
+.badge-doubtful { color: #ffb800 !important; }
+.explain-header-row.doubtful-hdr { border-left-color: #ffb800; }
+.explain-header-title.doubtful-hdr { color: #ffb800; }
+.explain-box.doubtful-box { border-color: rgba(255,184,0,0.25); }
+
+.conf-chip {
+  display: inline-block; text-align: right;
+  background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.22);
+  color: var(--cyan); font-size: 11.5px; font-weight: 600;
+  padding: 5px 13px; border-radius: 100px; margin-top: 5px;
+  font-family: var(--mono);
+}
+
+/* ===== RISK METER ===== */
+.risk-meter-wrap { margin-bottom: 0; }
+.risk-meter-labels {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; margin-bottom: 8px;
+}
+.meter-label-left { color: var(--green); font-weight: 700; font-family: 'Syne', sans-serif; }
+.meter-label-right { color: var(--red); font-weight: 700; font-family: 'Syne', sans-serif; }
+.meter-center-txt { font-size: 12.5px; font-weight: 700; color: var(--white); font-family: var(--mono); }
+
+.risk-track {
+  width: 100%; height: 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 20px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.risk-fill {
+  height: 100%; width: 0%; border-radius: 20px;
+  transition: width 1.3s cubic-bezier(0.22,1,0.36,1);
+}
+.risk-ticks {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: rgba(200,230,255,0.2); margin-top: 5px;
+  font-family: var(--mono);
+}
+
+/* ===== AI EXPLAIN BOX ===== */
+.explain-box {
+  background: rgba(4,8,18,0.96); border-radius: 14px;
+  border: 1px solid rgba(0,212,255,0.1); overflow: hidden;
+  margin-bottom: 10px;
+}
+.explain-box.scam-box { border-color: rgba(255,69,96,0.22); }
+.explain-box.real-box { border-color: rgba(0,224,150,0.2); }
+
+.explain-header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 16px; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.explain-header-row.scam-hdr { background: rgba(255,69,96,0.07); }
+.explain-header-row.real-hdr { background: rgba(0,224,150,0.06); }
+
+.explain-header-title {
+  font-size: 12px; font-weight: 700; letter-spacing: .4px;
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Syne', sans-serif;
+}
+.explain-header-title.scam-hdr { color: #ff8090; }
+.explain-header-title.real-hdr { color: var(--green); }
+
+/* ===== TTS BUTTON ===== */
+.tts-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.28);
+  color: var(--cyan); font-size: 11px; font-weight: 700;
+  padding: 5px 13px; border-radius: 100px; cursor: pointer;
+  transition: all .2s; font-family: 'Syne', sans-serif; white-space: nowrap;
+}
+.tts-btn:hover { background: rgba(0,212,255,0.22); box-shadow: 0 0 14px rgba(0,212,255,0.25); }
+.tts-btn.playing {
+  background: rgba(255,69,96,0.1); border-color: rgba(255,69,96,0.4); color: #ff8090;
+}
+.tts-wave { display: none; align-items: center; gap: 2px; height: 14px; }
+.tts-btn.playing .tts-wave { display: flex; }
+.tts-wave span {
+  display: block; width: 2.5px; border-radius: 3px;
+  background: #ff8090; animation: wave .8s ease-in-out infinite;
+}
+.tts-wave span:nth-child(1){ height:5px; animation-delay:0s; }
+.tts-wave span:nth-child(2){ height:11px; animation-delay:.15s; }
+.tts-wave span:nth-child(3){ height:7px; animation-delay:.3s; }
+.tts-wave span:nth-child(4){ height:11px; animation-delay:.45s; }
+.tts-wave span:nth-child(5){ height:5px; animation-delay:.6s; }
+@keyframes wave { 0%,100%{ transform:scaleY(.5); } 50%{ transform:scaleY(1.4); } }
+
+.explain-body { padding: 13px 16px; }
+.explain-line {
+  font-size: 12.5px; line-height: 1.65; margin-bottom: 7px;
+  padding: 9px 13px; border-radius: 9px;
+  color: rgba(220,240,255,0.88);
+}
+.explain-line.red-line { background: rgba(255,69,96,0.06); border-left: 2px solid rgba(255,69,96,0.5); }
+.explain-line.green-line { background: rgba(0,224,150,0.06); border-left: 2px solid rgba(0,224,150,0.45); }
+.explain-line.yellow-line { background: rgba(255,184,0,0.06); border-left: 2px solid rgba(255,184,0,0.45); }
+
+.explain-summary {
+  margin-top: 10px; padding: 10px 13px; border-radius: 10px;
+  font-size: 12px; font-weight: 600; text-align: center;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+  color: rgba(200,230,255,0.65);
+}
+.pdf-hint { margin-top: 10px; font-size: 11px; color: var(--muted); text-align: center; }
+.pdf-hint span { color: var(--cyan); cursor: pointer; }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed; top: 22px; left: 50%; transform: translateX(-50%) translateY(-90px);
+  background: rgba(8,14,26,0.97); border: 1px solid rgba(255,69,96,0.45);
+  color: #ff9090; padding: 12px 24px; border-radius: 14px;
+  font-size: 13px; font-weight: 500; z-index: 999;
+  transition: transform .4s cubic-bezier(.22,1,.36,1);
+  backdrop-filter: blur(20px); max-width: 500px; text-align: center;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: rgba(0,224,150,0.4); color: var(--green); }
+.toast.info { border-color: rgba(0,212,255,0.4); color: var(--cyan); }
+
+/* ===== REPORTS TABLE ===== */
+.reports-wrap { max-height: calc(100vh - 200px); overflow-y: auto; }
+.reports-wrap::-webkit-scrollbar { width: 3px; }
+.reports-wrap::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.25); border-radius: 3px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th {
+  padding: 10px 8px; text-align: center;
+  color: var(--label); font-weight: 700;
+  border-bottom: 1px solid var(--border);
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  font-family: var(--mono);
+}
+td {
+  padding: 10px 8px; text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: rgba(200,230,255,0.7);
+  transition: background .2s;
+}
+tr:hover td { background: rgba(0,212,255,0.04); }
+a.down {
+  color: var(--cyan); text-decoration: none; font-weight: 700; font-size: 11px;
+  background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2);
+  padding: 4px 10px; border-radius: 7px; display: inline-block;
+  transition: all .2s;
+}
+a.down:hover { background: rgba(0,212,255,0.18); box-shadow: 0 0 12px rgba(0,212,255,0.2); }
+.loading { opacity: .45; font-style: italic; }
+
+/* ===== TEXT WARNING ===== */
+#textWarning {
+  display: none; margin-top: 9px; padding: 10px 15px; border-radius: 11px;
+  background: rgba(255,184,0,0.07); border: 1px solid rgba(255,184,0,0.28);
+  color: rgba(255,210,80,0.95); font-size: 12.5px; font-weight: 500;
+}
+
+</style>
+</head>
+<body>
+
+<!-- BG LAYERS -->
+<canvas id="starCanvas"></canvas>
+<div class="bg-layer"></div>
+<div class="bg-grid"></div>
+
+<div class="container">
+
+<!-- ══ NAVBAR ══ -->
+<div class="navbar">
+  <div class="logo">
+    <div class="logo-icon">🛡</div>
+    <span class="logo-text">JobShield AI</span>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-ghost" id="reportBtn" style="font-size:12px; padding:8px 16px;">🚩 Report</button>
+    <div class="nav-user">
+      <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="user">
+      <span class="nav-username" id="userName">User</span>
+    </div>
+    <button class="btn" id="logoutBtn" style="font-size:12px; padding:8px 16px; background:linear-gradient(135deg,#cc2200,#ff4560);">⏻ Logout</button>
+  </div>
+</div>
+
+<!-- ══ GRID ══ -->
+<div class="grid">
+
+<!-- LEFT — ANALYSIS CARD -->
+<div class="card">
+  <div class="card-title">
+    🔍 AI Job Analysis
+    <span class="pill">ML Powered</span>
+  </div>
+
+  <!-- Textarea with wrapper -->
+  <div class="textarea-wrap">
+    <div class="textarea-topbar">
+      <span class="textarea-label">Job Description Input</span>
+      <span class="textarea-hint">Paste text, upload image, or PDF</span>
+    </div>
+    <textarea id="jobText" placeholder="Paste job description, offer letter, or recruitment text here...
+
+Example: Urgent hiring! Work from home earn ₹5000 daily. No experience needed. Call 9876543210 now!"></textarea>
+  </div>
+
+  <div id="textWarning">
+    ⚠️ This doesn't look like a job description. Please paste a valid job posting, offer letter or recruitment text.
+  </div>
+
+  <!-- Upload Buttons — COLORED -->
+  <div class="upload-row">
+    <label class="upload-btn img-btn">
+      <span class="btn-icon">🖼️</span>
+      <span class="btn-text">
+        <span class="top">Upload Image</span>
+        <span class="sub">JPG / PNG / WEBP</span>
+      </span>
+      <input type="file" id="imgInput" accept=".jpg,.jpeg,.png,.webp,.bmp">
+    </label>
+    <label class="upload-btn pdf-btn">
+      <span class="btn-icon">📄</span>
+      <span class="btn-text">
+        <span class="top">Upload PDF</span>
+        <span class="sub">Extract text from PDF</span>
+      </span>
+      <input type="file" id="pdfInput" accept=".pdf">
+    </label>
+  </div>
+
+  <div id="uploadTag" style="display:none;">
+    <div class="upload-tag">
+      <span id="uploadTagName">file.pdf</span>
+      <span class="remove" onclick="clearUpload()">✕</span>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-row">
+    <button type="button" class="btn" id="analyzeBtn">⚡ Analyze</button>
+    <button type="button" class="btn btn-ghost" id="clearBtn">✕ Clear</button>
+    <button type="button" class="btn btn-ghost" onclick="goHome()" style="font-size:12px;">🏠 Home</button>
+  </div>
+
+  <!-- ══ SCAN ANIMATION ══ -->
+  <div id="scanSection">
+    <div class="scan-header">
+      <div class="spinner-sm"></div>
+      <div class="scan-step-text" id="scanStepText">🔍 Initializing AI...</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="checklist">
+      <div class="check-item" id="step1">📄 Reading content</div>
+      <div class="check-item" id="step2">🔍 Scanning keywords</div>
+      <div class="check-item" id="step3">🧠 NLP analysis</div>
+      <div class="check-item" id="step4">⚠️ Fraud patterns</div>
+      <div class="check-item" id="step5">📊 Confidence score</div>
+      <div class="check-item" id="step6">📝 Generating report</div>
+    </div>
+  </div>
+
+  <!-- ══ RESULT ══ -->
+  <div id="resultSection">
+    <div class="result-card" id="resultCard">
+      <div class="result-top-row">
+        <div class="result-pred-block">
+          <div class="result-label-sm">Prediction</div>
+          <span class="result-pred-val" id="predText">—</span>
+          <div id="verdictBadge" class="verdict-badge" style="display:none;"></div>
+        </div>
+        <div class="result-conf-block">
+          <div class="result-label-sm">Confidence</div>
+          <span class="result-conf-val" id="confText">—</span>
+          <div class="conf-chip" id="confChip">—</div>
+        </div>
+      </div>
+      <div class="risk-meter-wrap">
+        <div class="risk-meter-labels">
+          <span class="meter-label-left">● Legit</span>
+          <span class="meter-center-txt" id="meterPct">—</span>
+          <span class="meter-label-right">● Scam</span>
+        </div>
+        <div class="risk-track">
+          <div class="risk-fill" id="meterFill"></div>
+        </div>
+        <div class="risk-ticks">
+          <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="explain-box" id="explainBox">
+      <div class="explain-header-row" id="explainHeaderRow">
+        <div class="explain-header-title" id="explainHeader">🤖 AI Analysis</div>
+        <button class="tts-btn" id="ttsBtn" onclick="toggleTTS()">
+          <span id="ttsIcon">🔊</span>
+          <span id="ttsTxt">Read Aloud</span>
+          <div class="tts-wave">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </button>
+      </div>
+      <!-- VOICE SELECTOR BAR — moved to result.html -->
+      <div class="tts-controls" id="ttsControls"></div>
+      <div class="explain-body" id="explainBody"></div>
+    </div>
+
+    <div class="pdf-hint">📄 Download full report from <span>My Reports →</span></div>
+  </div>
+</div>
+
+<!-- RIGHT — REPORTS CARD -->
+<div class="card">
+  <div class="card-title">
+    📂 My Reports
+    <span class="pill">History</span>
+  </div>
+
+  <!-- Mini stats row -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;position:relative;z-index:1;">
+    <div style="background:rgba(255,69,96,0.08);border:1px solid rgba(255,69,96,0.2);border-radius:12px;padding:10px 8px;text-align:center;">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:rgba(255,69,96,0.7);text-transform:uppercase;margin-bottom:4px;">Scams</div>
+      <div id="statScam" style="font-family:'Syne',sans-serif;font-weight:900;font-size:22px;color:#ff4560;">—</div>
+    </div>
+    <div style="background:rgba(0,224,150,0.07);border:1px solid rgba(0,224,150,0.2);border-radius:12px;padding:10px 8px;text-align:center;">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:rgba(0,224,150,0.7);text-transform:uppercase;margin-bottom:4px;">Legit</div>
+      <div id="statLegit" style="font-family:'Syne',sans-serif;font-weight:900;font-size:22px;color:var(--green);">—</div>
+    </div>
+    <div style="background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.18);border-radius:12px;padding:10px 8px;text-align:center;">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:rgba(0,212,255,0.7);text-transform:uppercase;margin-bottom:4px;">Total</div>
+      <div id="statTotal" style="font-family:'Syne',sans-serif;font-weight:900;font-size:22px;color:var(--cyan);">—</div>
+    </div>
+  </div>
+
+  <div class="reports-wrap">
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Result</th><th>Conf%</th><th>Date</th><th>PDF</th></tr>
+      </thead>
+      <tbody id="reportsBody">
+        <tr><td colspan="5" class="loading">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- end grid -->
+</div><!-- end container -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =========================================================
+// CONFIG — Change this if your backend runs on a different port
+// =========================================================
+const API = "http://127.0.0.1:5000";
+
+// =========================================================
+// STATE
+// =========================================================
+let uploadedFile = null;
+let uploadedType = null;
+let ttsUtterance = null;
+let ttsPlaying   = false;
+let ttsText      = "";
+let analyzing    = false;
+
+// =========================================================
+// HELPER: safe home redirect
+// =========================================================
+function goHome(){
+  const pages = ["index.html", "/", "home.html"];
+  window.location.href = pages[0];
+}
+
+// =========================================================
+// TOAST
+// =========================================================
+let toastTimer = null;
+function showToast(msg, type="error", duration=4000){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast " + (type === "success" ? "success" : type === "info" ? "info" : "");
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), duration);
+}
+
+// =========================================================
+// CONNECTION STATUS
+// =========================================================
+async function checkConnection(){
+  const el = document.getElementById("connStatus");
+  try {
+    const res = await fetch(API + "/me", { credentials:"include" });
+    if(res.status === 401 || res.ok){
+      el.textContent = "● Backend Connected";
+      el.className = "ok";
+      el.style.display = "inline-block";
+    }
+  } catch {
+    el.textContent = "● Backend Offline";
+    el.className = "";
+    el.style.display = "inline-block";
+    showToast("⚠️ Cannot reach backend. Make sure app.py is running on port 5000.", "error", 8000);
+  }
+}
+
+// =========================================================
+// AUTH CHECK
+// =========================================================
+async function checkAuth(){
+  try {
+    const res = await fetch(API + "/me", { credentials:"include" });
+    if(res.status === 401){
+      // Not logged in — redirect to login
+      window.location.href = "login.html";
+      return;
+    }
+    const data = await res.json();
+    if(data.error === "login"){
+      window.location.href = "login.html";
+      return;
+    }
+    if(data.username){
+      document.getElementById("userName").innerText = data.username;
+      // Show admin badge if applicable
+      if(data.role === "admin"){
+        document.getElementById("userName").innerText = data.username + " (Admin)";
+      }
+    }
+  } catch(err){
+    console.warn("Auth check failed — backend may be offline");
+  }
+}
+
+// =========================================================
+// LOGOUT
+// =========================================================
+document.getElementById("logoutBtn").onclick = async () => {
+  speechSynthesis.cancel();
+  try {
+    await fetch(API + "/logout", { method:"POST", credentials:"include" });
+  } catch(e) { /* ignore */ }
+  localStorage.removeItem("lastResult");
+  window.location.href = "login.html";
+};
+
+// =========================================================
+// REPORT TO ADMIN
+// =========================================================
+document.getElementById("reportBtn").onclick = async () => {
+  const msg = prompt("Describe the issue or suspicious job:");
+  if(!msg || !msg.trim()) return;
+  try {
+    const res = await fetch(API + "/report-admin", {
+      method:"POST", credentials:"include",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ message: msg })
+    });
+    const data = await res.json();
+    if(data.error === "login"){ window.location.href = "login.html"; return; }
+    showToast(
+      data.status === "success" ? "✅ Report sent to admin!" : "❌ Failed to send report.",
+      data.status === "success" ? "success" : "error"
+    );
+  } catch {
+    showToast("❌ Could not reach server.");
+  }
+};
+
+// =========================================================
+// TTS
+// =========================================================
+// =========================================================
+// VOICE SYSTEM — voice selector is on result.html
+// Dashboard just reads saved voice from localStorage
+// =========================================================
+function getSelectedVoice(){
+  const saved = localStorage.getItem("tts_voice_name");
+  if(!saved) return null;
+  return speechSynthesis.getVoices().find(v => v.name === saved) || null;
+}
+
+// =========================================================
+// TTS — UPDATED (uses selected voice, 1.1x speed)
+// =========================================================
+function toggleTTS(){
+  if(ttsPlaying){ speechSynthesis.cancel(); setTTSState(false); return; }
+  if(!ttsText) return;
+  ttsUtterance = new SpeechSynthesisUtterance(ttsText);
+  ttsUtterance.rate  = 1.1;   // ← 1.1x as requested
+  ttsUtterance.pitch = 1;
+  const v = getSelectedVoice();
+  if(v) ttsUtterance.voice = v;
+  else  ttsUtterance.lang  = "en-IN"; // fallback
+  ttsUtterance.onstart = () => setTTSState(true);
+  ttsUtterance.onend   = () => setTTSState(false);
+  ttsUtterance.onerror = () => setTTSState(false);
+  speechSynthesis.cancel();
+  speechSynthesis.speak(ttsUtterance);
+}
+
+function setTTSState(playing){
+  ttsPlaying = playing;
+  const btn  = document.getElementById("ttsBtn");
+  const icon = document.getElementById("ttsIcon");
+  const txt  = document.getElementById("ttsTxt");
+  if(playing){
+    btn.classList.add("playing"); icon.textContent = "⏹"; txt.textContent = "Stop";
+  } else {
+    btn.classList.remove("playing"); icon.textContent = "🔊"; txt.textContent = "Read Aloud";
+  }
+}
+
+function buildTTSText(label, conf, scamSignals, legitSignals, scamProb){
+  const isScam     = label === "Scam Job";
+  const isDoubtful = label === "Doubtful";
+  let text = isScam
+    ? `Warning! This job posting has been detected as a scam. Scam risk: ${scamProb} percent. `
+    : isDoubtful
+    ? `Caution! This job posting is doubtful. Risk score: ${scamProb} percent. Verify carefully before applying. `
+    : `This job posting appears to be legitimate. Confidence: ${conf}. Scam risk: ${scamProb} percent. `;
+  if(isScam && scamSignals?.length){
+    text += "The following suspicious indicators were found. ";
+    scamSignals.forEach(s => { text += s.replace(/^[🔴🟡✅]\s*/u, "") + ". "; });
+  }
+  if(isDoubtful){
+    if(scamSignals?.length){
+      text += "Suspicious indicators found. ";
+      scamSignals.forEach(s => { text += s.replace(/^[🔴🟡✅]\s*/u, "") + ". "; });
+    }
+    if(legitSignals?.length){
+      text += "Some positive signals also found. ";
+      legitSignals.forEach(s => { text += s.replace(/^[🔴🟡✅]\s*/u, "") + ". "; });
+    }
+  }
+  if(!isScam && !isDoubtful && legitSignals?.length){
+    text += "The following credibility indicators were found. ";
+    legitSignals.forEach(s => { text += s.replace(/^[🔴🟡✅]\s*/u, "") + ". "; });
+  }
+  text += isScam
+    ? "Do not pay any fees or share personal details with this employer."
+    : isDoubtful
+    ? "Verify the company thoroughly before sharing any personal details."
+    : "Still verify the company independently before applying.";
+  return text;
+}
+
+// =========================================================
+// STAR BACKGROUND
+// =========================================================
+(function(){
+  const canvas = document.getElementById("starCanvas");
+  const ctx    = canvas.getContext("2d");
+  let stars = [], meteors = [], W, H;
+  function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  function initStars(){
+    stars = [];
+    const count = Math.floor((W * H) / 6000);
+    for(let i = 0; i < count; i++) stars.push({
+      x: Math.random() * W, y: Math.random() * H,
+      r: Math.random() * 1.6 + 0.2,
+      alpha: Math.random(),
+      delta: (Math.random() * 0.008 + 0.003) * (Math.random() < 0.5 ? 1 : -1),
+      color: Math.random() < 0.15 ? "#00e0ff" : Math.random() < 0.1 ? "#0066ff" : "#ffffff"
+    });
+  }
+  function spawnMeteor(){
+    meteors.push({ x: Math.random()*W*0.7, y: -20, len: Math.random()*80+50, speed: Math.random()*3+2, a: 1 });
+  }
+  setInterval(spawnMeteor, 2800); spawnMeteor();
+  function drawStars(){
+    if(!W || !H) { requestAnimationFrame(drawStars); return; }
+    ctx.clearRect(0, 0, W, H);
+    const g1 = ctx.createRadialGradient(W*.15, H*.15, 0, W*.15, H*.15, W*.35);
+    g1.addColorStop(0, "rgba(0,102,255,0.18)"); g1.addColorStop(1, "transparent");
+    ctx.fillStyle = g1; ctx.fillRect(0, 0, W, H);
+    const g2 = ctx.createRadialGradient(W*.85, H*.25, 0, W*.85, H*.25, W*.3);
+    g2.addColorStop(0, "rgba(0,212,255,0.15)"); g2.addColorStop(1, "transparent");
+    ctx.fillStyle = g2; ctx.fillRect(0, 0, W, H);
+    for(let s of stars){
+      s.alpha = Math.max(0.05, Math.min(1, s.alpha + s.delta));
+      if(s.alpha <= 0.05 || s.alpha >= 1) s.delta *= -1;
+      ctx.save(); ctx.globalAlpha = s.alpha;
+      if(s.r > 1.2){ ctx.shadowBlur = s.r * 6; ctx.shadowColor = s.color; }
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.color; ctx.fill(); ctx.restore();
+    }
+    // meteors — safe guard against NaN coords
+    meteors = meteors.filter(m => m.a > 0.02);
+    for(let m of meteors){
+      m.x += Math.cos(Math.PI/5)*m.speed;
+      m.y += Math.sin(Math.PI/5)*m.speed;
+      m.a  -= 0.012;
+      const tx = m.x - Math.cos(Math.PI/5)*m.len;
+      const ty = m.y - Math.sin(Math.PI/5)*m.len;
+      if(!isFinite(tx)||!isFinite(ty)||!isFinite(m.x)||!isFinite(m.y)) continue;
+      try {
+        const g = ctx.createLinearGradient(tx, ty, m.x, m.y);
+        g.addColorStop(0, "rgba(255,255,255,0)");
+        g.addColorStop(1, `rgba(0,212,255,${m.a.toFixed(3)})`);
+        ctx.save(); ctx.globalAlpha = m.a;
+        ctx.shadowBlur = 4; ctx.shadowColor = "#00d4ff";
+        ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(m.x,m.y);
+        ctx.strokeStyle = g; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(m.x,m.y,1.2,0,Math.PI*2);
+        ctx.fillStyle = "#fff"; ctx.fill(); ctx.restore();
+      } catch(e) { /* skip broken meteor */ }
+    }
+    requestAnimationFrame(drawStars);
+  }
+  window.addEventListener("resize", () => { resize(); initStars(); });
+  resize(); initStars(); drawStars();
+})();
+
+// =========================================================
+// FILE UPLOAD
+// =========================================================
+document.getElementById("imgInput").onchange = async (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  await handleFileUpload(file, "image");
+  e.target.value = "";
+};
+document.getElementById("pdfInput").onchange = async (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  await handleFileUpload(file, "pdf");
+  e.target.value = "";
+};
+
+async function handleFileUpload(file, type){
+  const endpoint = type === "image" ? "/extract-image" : "/extract-pdf";
+  showToast(
+    type === "image" ? "⏳ Extracting text from image... Please wait" : "⏳ Extracting text from PDF...",
+    "info", 30000
+  );
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const res  = await fetch(API + endpoint, { method:"POST", credentials:"include", body:formData });
+    const data = await res.json();
+
+    if(data.error === "login"){ window.location.href = "login.html"; return; }
+    if(data.error){ showToast(data.message || "❌ Could not process file."); return; }
+
+    // ── DUPLICATE: same user already scanned this file ──
+    if(data.duplicate){
+      showToast("🔁 Already Analyzed — Showing your previous result!", "info", 5000);
+      const scamProb = data.scam_prob || 0;
+      const conf     = (data.confidence || 0) + "%";
+      showResult(data.label, conf, [], [], scamProb);
+      // Build TTS from explanation stored in DB
+      const isScam     = data.label === "Scam Job";
+      const isDoubtful = data.label === "Doubtful";
+      ttsText = isScam
+        ? `Warning! This job posting was previously detected as a scam. Scam risk: ${scamProb} percent. Do not pay any fees or share personal details.`
+        : isDoubtful
+        ? `Caution! This job was previously marked as doubtful. Risk score: ${scamProb} percent. Verify carefully before applying.`
+        : `This job was previously analyzed and appears legitimate. Scam risk: ${scamProb} percent. Still verify before applying.`;
+      // Store for result page redirect
+      localStorage.setItem("jobshield_result", JSON.stringify({
+        label:       data.label,
+        conf:        conf,
+        scamProb:    scamProb,
+        scamSignals: [],
+        legitSignals:[],
+        reportId:    data.report_id
+      }));
+      // Show previously analyzed tag
+      document.getElementById("uploadTagName").textContent =
+        `${type === "image" ? "🖼️" : "📄"} ${file.name} — ♻️ Previously analyzed on ${data.created_at ? data.created_at.split(" ")[0] : ""}`;
+      document.getElementById("uploadTag").style.display = "block";
+      return;
+    }
+
+    // Store file_hash for use in /predict call
+    window._lastFileHash = data.file_hash || null;
+
+    document.getElementById("jobText").value = data.text;
+    uploadedFile = file; uploadedType = type;
+    document.getElementById("uploadTagName").textContent =
+      `${type === "image" ? "🖼️" : "📄"} ${file.name} (${data.chars} chars extracted)`;
+    document.getElementById("uploadTag").style.display = "block";
+    showToast("✅ Text extracted successfully! Click Analyze to scan.", "success");
+  } catch(err){
+    showToast("❌ Server error. Make sure app.py is running.");
+    console.error(err);
+  }
+}
+
+function clearUpload(){
+  uploadedFile = null; uploadedType = null;
+  document.getElementById("uploadTag").style.display = "none";
+}
+
+// =========================================================
+// TEXTAREA VALIDATION
+// =========================================================
+const JOB_KEYWORDS = [
+  "job","hiring","vacancy","apply","salary","position","role","experience",
+  "qualification","candidate","interview","joining","ctc","lpa","work","company",
+  "fresher","part time","full time","remote","wfh","internship","offer letter",
+  "appointment","recruitment","resume","cv","hr","urgent","earn","payment",
+  "training","work from home","contact","call","whatsapp","required","opening",
+  "post","designation","department","skill","engineer","manager","developer",
+  "analyst","executive","assistant","staff","worker"
+];
+
+let warningTimer = null;
+document.getElementById("jobText").addEventListener("input", function(){
+  clearTimeout(warningTimer);
+  const val = this.value.trim();
+  const warn = document.getElementById("textWarning");
+  if(val.length === 0){ warn.style.display = "none"; return; }
+  warningTimer = setTimeout(() => {
+    if(val.length < 10){ warn.style.display = "none"; return; }
+    const lower = val.toLowerCase();
+    const wordCount = val.trim().split(/\s+/).length;
+    const hasJobKw = JOB_KEYWORDS.some(kw => lower.includes(kw));
+    const avgWordLen = val.replace(/\s+/g," ").split(" ").reduce((a,w) => a + w.length, 0) / Math.max(wordCount, 1);
+    const looksRandom = !hasJobKw && (wordCount < 4 || avgWordLen > 12);
+    warn.style.display = looksRandom ? "block" : "none";
+  }, 600);
+});
+
+// =========================================================
+// SCAN ANIMATION
+// =========================================================
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+async function runScanAnimation(){
+  const bar      = document.getElementById("progressBar");
+  const stepText = document.getElementById("scanStepText");
+  const steps = [
+    {id:"step1", text:"📄 Reading job content...",            pct:15,  wait:700},
+    {id:"step2", text:"🔍 Scanning for scam keywords...",    pct:32,  wait:800},
+    {id:"step3", text:"🧠 Running NLP text analysis...",      pct:52,  wait:900},
+    {id:"step4", text:"⚠️ Checking fraud patterns...",        pct:68,  wait:750},
+    {id:"step5", text:"📊 Computing confidence score...",    pct:84,  wait:700},
+    {id:"step6", text:"📝 Generating AI report...",          pct:95,  wait:600},
+  ];
+  for(let i = 0; i < steps.length; i++){
+    const s = steps[i];
+    if(i > 0) document.getElementById(steps[i-1].id).className = "check-item done";
+    document.getElementById(s.id).className = "check-item active";
+    stepText.innerText = s.text;
+    bar.style.width = s.pct + "%";
+    await sleep(s.wait);
+  }
+  document.getElementById("step6").className = "check-item done";
+}
+
+function hideScanSection(){
+  document.getElementById("scanSection").classList.remove("active");
+}
+
+function resetChecklist(){
+  [
+    {id:"step1",text:"📄 Reading content"},
+    {id:"step2",text:"🔍 Scanning keywords"},
+    {id:"step3",text:"🧠 NLP analysis"},
+    {id:"step4",text:"⚠️ Fraud patterns"},
+    {id:"step5",text:"📊 Confidence score"},
+    {id:"step6",text:"📝 Generating report"}
+  ].forEach(s => {
+    const el = document.getElementById(s.id);
+    el.innerText = s.text;
+    el.className = "check-item";
+  });
+  document.getElementById("progressBar").style.width = "0%";
+  document.getElementById("scanStepText").innerText = "🔍 Initializing AI...";
+}
+
+function hideResult(){
+  speechSynthesis.cancel();
+  setTTSState(false);
+  const rs = document.getElementById("resultSection");
+  rs.style.transition = "none";
+  rs.style.opacity = "0";
+  rs.style.display = "none";
+  document.getElementById("ttsControls").classList.remove("visible");
+  ttsText = "";
+}
+
+// =========================================================
+// SHOW RESULT
+// =========================================================
+function showResult(label, conf, scamSignals, legitSignals, scamProb){
+  const isScam     = label === "Scam Job";
+  const isDoubtful = label === "Doubtful";
+  const theme      = isScam ? "scam" : isDoubtful ? "doubtful" : "legit";
+
+  speechSynthesis.cancel();
+  setTTSState(false);
+
+  // Prediction text
+  const predEl = document.getElementById("predText");
+  predEl.innerText = label;
+  predEl.className = isScam ? "result-pred-val badge-scam" : isDoubtful ? "result-pred-val badge-doubtful" : "result-pred-val badge-real";
+
+  // Verdict badge
+  const badge = document.getElementById("verdictBadge");
+  badge.style.display = "inline-flex";
+  badge.className = "verdict-badge " + theme;
+  badge.innerText = isScam ? "🚨 Scam Detected" : isDoubtful ? "⚠️ Doubtful Job" : "✅ Looks Legitimate";
+
+  // Confidence
+  const confEl = document.getElementById("confText");
+  confEl.innerText = conf;
+  confEl.className = isScam ? "result-conf-val badge-scam" : isDoubtful ? "result-conf-val badge-doubtful" : "result-conf-val badge-real";
+  document.getElementById("confChip").innerText = "Confidence: " + conf;
+
+  // Risk meter — 4 zone colors matching new thresholds
+  const meterVal = scamProb !== undefined ? scamProb : parseFloat(conf);
+  const meterColor = meterVal <= 25
+    ? "linear-gradient(90deg,#00c853,#00e096)"
+    : meterVal <= 55
+    ? "linear-gradient(90deg,#f9a825,#ffb800)"
+    : meterVal <= 75
+    ? "linear-gradient(90deg,#e65100,#ff6400)"
+    : "linear-gradient(90deg,#c62828,#ff4560)";
+  const meterTxtColor = meterVal <= 25 ? "#00e096" : meterVal <= 55 ? "#ffb800" : meterVal <= 75 ? "#ff6400" : "#ff4560";
+  const meterTxt = document.getElementById("meterPct");
+  meterTxt.innerText = meterVal + "% scam risk";
+  meterTxt.style.color = meterTxtColor;
+
+  const fill = document.getElementById("meterFill");
+  fill.style.background  = meterColor;
+  fill.style.transition  = "none";
+  fill.style.width       = "0%";
+
+  // Explain box
+  const headerRow = document.getElementById("explainHeaderRow");
+  const headerTxt = document.getElementById("explainHeader");
+  headerRow.className = "explain-header-row " + (isScam ? "scam-hdr" : isDoubtful ? "doubtful-hdr" : "real-hdr");
+  headerTxt.className = "explain-header-title " + (isScam ? "scam-hdr" : isDoubtful ? "doubtful-hdr" : "real-hdr");
+  headerTxt.innerHTML = isScam
+    ? "🚨 SCAM DETECTED — Suspicious Indicators Found"
+    : isDoubtful
+    ? "⚠️ DOUBTFUL JOB — Mixed Signals Found"
+    : "✅ LOOKS LEGITIMATE — Credibility Indicators Found";
+
+  const box  = document.getElementById("explainBox");
+  const body = document.getElementById("explainBody");
+  box.className = "explain-box " + (isScam ? "scam-box" : isDoubtful ? "doubtful-box" : "real-box");
+
+  // Build signal lines
+  let html = "";
+  const primary   = isScam ? (scamSignals  || []) : (legitSignals || []);
+  const secondary = isScam ? (legitSignals || []) : (scamSignals  || []);
+
+  if(isDoubtful){
+    // Show both scam and legit signals for doubtful
+    for(let sig of (scamSignals||[])){
+      let cls = "red-line"; if(sig.startsWith("🟡")) cls = "yellow-line";
+      html += `<div class="explain-line ${cls}">${sig}</div>`;
+    }
+    if((legitSignals||[]).length){
+      html += `<div class="explain-line" style="color:rgba(255,255,255,0.35);font-size:11px;padding:4px 0;">Also found (positive signals):</div>`;
+      for(let sig of (legitSignals||[])){
+        html += `<div class="explain-line green-line">${sig}</div>`;
+      }
+    }
+  } else {
+    for(let sig of primary){
+      let cls = isScam ? "red-line" : "green-line";
+      if(sig.startsWith("🟡")) cls = "yellow-line";
+      html += `<div class="explain-line ${cls}">${sig}</div>`;
+    }
+    if(secondary.length){
+      html += `<div class="explain-line" style="color:rgba(255,255,255,0.35);font-size:11px;padding:4px 0;">
+        ${isScam ? "Also found:" : "Minor concerns (insufficient to flag as scam):"}
+      </div>`;
+      for(let sig of secondary){
+        let cls = isScam ? "green-line" : "red-line";
+        if(sig.startsWith("🟡")) cls = "yellow-line";
+        html += `<div class="explain-line ${cls}">${sig}</div>`;
+      }
+    }
+  }
+
+  const confNum = parseFloat(conf);
+  html += `<div class="explain-summary">
+    📊 AI Score: ${isScam ? confNum + "% scam risk" : isDoubtful ? confNum + "% risk — borderline" : confNum + "% legitimate confidence"}
+    ${isScam
+      ? " — ⚠️ Do NOT pay any fees or share personal details."
+      : isDoubtful
+      ? " — ⚠️ Verify company thoroughly before sharing any details."
+      : " — ✅ Still verify company independently before applying."}
+  </div>`;
+  body.innerHTML = html;
+
+  // Show voice controls bar
+  document.getElementById("ttsControls").classList.add("visible");
+
+  // Build TTS text
+  ttsText = buildTTSText(label, conf, scamSignals, legitSignals, meterVal);
+
+  // Show result section — double rAF ensures browser renders before transition
+  const rs = document.getElementById("resultSection");
+  rs.style.transition = "none";
+  rs.style.opacity = "0";
+  rs.style.display = "block";
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      rs.style.transition = "opacity 0.4s ease";
+      rs.style.opacity = "1";
+    });
+  });
+
+  // Animate meter fill after brief delay
+  setTimeout(() => {
+    fill.style.transition = "width 1.3s cubic-bezier(0.22,1,0.36,1)";
+    fill.style.width = meterVal + "%";
+  }, 200);
+
+  // Refresh reports table
+  setTimeout(loadReports, 800);
+}
+
+// =========================================================
+// ANALYZE BUTTON
+// =========================================================
+document.getElementById("analyzeBtn").onclick = async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  if(analyzing) return;
+
+  const text = document.getElementById("jobText").value.trim();
+  if(!text){
+    showToast("⚠️ Please enter a job description or upload a file first!");
+    return;
+  }
+
+  const btn = document.getElementById("analyzeBtn");
+  btn.disabled = true;
+  analyzing = true;
+
+  // Reset & hide previous result
+  hideResult();
+  hideScanSection();
+  resetChecklist();
+
+  // Small delay so CSS transitions settle
+  await sleep(50);
+
+  // Show scan animation
+  document.getElementById("scanSection").classList.add("active");
+
+  // Start animation (runs in parallel with the API call)
+  const animPromise = runScanAnimation();
+
+  try {
+    const res = await fetch(API + "/predict", {
+      method:      "POST",
+      credentials: "include",
+      headers:     {"Content-Type": "application/json"},
+      body:        JSON.stringify({ job_text: text, file_hash: window._lastFileHash || null })
+    });
+
+    // Handle auth failure
+    if(res.status === 401){
+      showToast("⚠️ Session expired. Please login again.");
+      return;
+    }
+
+    if(!res.ok){
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `Server returned ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    // Wait for animation to finish
+    await animPromise;
+
+    if(data.error === "login"){ showToast("⚠️ Session expired. Please login again."); return; }
+
+    // Complete progress bar
+    document.getElementById("progressBar").style.width = "100%";
+    document.getElementById("scanStepText").innerText  = "✅ Analysis Complete!";
+    await sleep(600);
+
+    // Extract fields — backend returns BOTH 'label' and 'prediction'
+    const label       = data.label || data.prediction || "Unknown";
+    const conf        = (data.confidence || "0") + "%";
+    const scamProb    = Math.round((data.probs?.scam || 0) * 100);
+    const scamSignals = data.scam_signals  || [];
+    const legitSignals= data.legit_signals || [];
+
+    // Hide scan, redirect to result page
+    hideScanSection();
+
+    // Save full result to localStorage
+    localStorage.setItem("jobshield_result", JSON.stringify({
+      label,
+      conf,
+      scamProb,
+      scamSignals,
+      legitSignals,
+      reportId: data.report_id || null
+    }));
+
+    // Redirect to result page
+    window.location.href = "result.html";
+
+  } catch(err) {
+    await animPromise.catch(() => {});
+    hideScanSection();
+    showToast("❌ " + (err.message || "Backend connection error. Is app.py running?"));
+    console.error("Analyze error:", err);
+  }
+
+  btn.disabled = false;
+  analyzing = false;
+};
+
+// =========================================================
+// CLEAR BUTTON
+// =========================================================
+document.getElementById("clearBtn").onclick = () => {
+  speechSynthesis.cancel();
+  setTTSState(false);
+  document.getElementById("jobText").value = "";
+  document.getElementById("textWarning").style.display = "none";
+  hideResult();
+  hideScanSection();
+  clearUpload();
+  resetChecklist();
+  localStorage.removeItem("lastResult");
+  window._lastFileHash = null;
+};
+
+// =========================================================
+// LOAD REPORTS TABLE
+// =========================================================
+async function loadReports(){
+  const tbody = document.getElementById("reportsBody");
+  try {
+    const res = await fetch(API + "/reports", { credentials:"include" });
+    if(!res.ok){ tbody.innerHTML = `<tr><td colspan="5" style="color:rgba(255,77,77,0.5)">Could not load reports.</td></tr>`; return; }
+    const list = await res.json();
+
+    if(!Array.isArray(list) || !list.length){
+      tbody.innerHTML = `<tr><td colspan="5" style="color:rgba(255,255,255,0.3);padding:20px;">No reports yet. Analyze a job to get started!</td></tr>`;
+      document.getElementById("statScam").innerText  = "0";
+      document.getElementById("statLegit").innerText = "0";
+      document.getElementById("statTotal").innerText = "0";
+      return;
+    }
+
+    // Update stats
+    const scamCount     = list.filter(r => r.label === "Scam Job").length;
+    const doubtfulCount = list.filter(r => r.label === "Doubtful").length;
+    const legitCount    = list.filter(r => r.label === "Real Job").length;
+    document.getElementById("statScam").innerText  = scamCount;
+    document.getElementById("statLegit").innerText = legitCount;
+    document.getElementById("statTotal").innerText = list.length;
+
+    tbody.innerHTML = list.map(r => {
+      const isScam     = r.label === "Scam Job";
+      const isDoubtful = r.label === "Doubtful";
+      const dotCol  = isScam ? "#ff4560" : isDoubtful ? "#ffb800" : "#00e096";
+      const txtCol  = isScam ? "#ff7085" : isDoubtful ? "#ffb800" : "#00e096";
+      const lbl     = isScam ? "Scam" : isDoubtful ? "Doubtful" : "Legit";
+      const dateStr = r.created_at ? r.created_at.split(" ")[0] : "—";
+      return `<tr>
+        <td style="color:rgba(255,255,255,0.35);font-family:var(--mono);font-size:11px;">#${r.id}</td>
+        <td>
+          <span style="display:inline-flex;align-items:center;gap:5px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:${dotCol};box-shadow:0 0 5px ${dotCol};flex-shrink:0;"></span>
+            <span style="color:${txtCol};font-weight:700;font-size:11.5px;">${lbl}</span>
+          </span>
+        </td>
+        <td style="color:rgba(200,230,255,0.7);font-family:var(--mono);font-size:11px;">${r.confidence}%</td>
+        <td style="color:rgba(255,255,255,0.35);font-size:11px;">${dateStr}</td>
+        <td><a class="down" href="${API}/reports/${r.id}/download" target="_blank">⬇ PDF</a></td>
+      </tr>`;
+    }).join("");
+  } catch {
+    tbody.innerHTML = `<tr><td colspan="5" style="color:rgba(255,77,77,0.5)">Could not load reports — is backend running?</td></tr>`;
+  }
+}
+
+// =========================================================
+// INIT
+// =========================================================
+document.addEventListener("DOMContentLoaded", async () => {
+  await checkAuth();
+  loadReports();
+});
+</script>
+</body>
+</html>

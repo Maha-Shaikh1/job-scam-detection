@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JobShield AI — Result</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+:root {
+  --bg:    #0a1628;
+  --blue:  #1a5cff;
+  --cyan:  #00d4ff;
+  --green: #00e096;
+  --red:   #ff4560;
+  --amber: #ffb800;
+  --white: #f0f8ff;
+  --sub:   rgba(220,240,255,0.82);
+  --muted: rgba(160,210,255,0.5);
+  --mono:  'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  color: var(--white);
+  min-height: 100vh;
+  background: var(--bg);
+  overflow-x: hidden;
+}
+
+/* ═══ BG ═══ */
+#starCanvas { position:fixed; inset:0; pointer-events:none; z-index:0; }
+.bg-glow {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 65% 55% at 15% 10%, rgba(26,92,255,0.55) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 50% at 88% 85%, rgba(0,212,255,0.45) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,212,255,0.18) 0%, transparent 60%);
+}
+.bg-grid {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.09) 1px, transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse 90% 90% at 50% 50%, black 10%, transparent 85%);
+}
+
+/* ═══ PAGE ═══ */
+.page { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; }
+
+/* ═══ NAVBAR ═══ */
+.navbar {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:12px 28px; height:60px;
+  background:rgba(7,17,31,0.85); backdrop-filter:blur(32px);
+  border-bottom:1px solid rgba(0,212,255,0.1);
+  position:sticky; top:0; z-index:100;
+}
+.navbar::after {
+  content:''; position:absolute; bottom:0; left:10%; right:10%; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,212,255,0.35),transparent);
+}
+.logo { font-family:'Syne',sans-serif; font-weight:900; font-size:19px; display:flex; align-items:center; gap:10px; }
+.logo-icon {
+  width:34px; height:34px; border-radius:10px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  display:flex; align-items:center; justify-content:center; font-size:16px;
+  box-shadow:0 0 16px rgba(0,212,255,0.35);
+}
+.logo-text { background:linear-gradient(90deg,#fff 30%,var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+.back-btn {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:8px 18px; border-radius:10px; border:1px solid rgba(0,212,255,0.25);
+  background:rgba(0,212,255,0.07); color:var(--cyan);
+  font-family:'Syne',sans-serif; font-weight:800; font-size:12.5px;
+  cursor:pointer; text-decoration:none; transition:all .22s;
+}
+.back-btn:hover { background:rgba(0,212,255,0.15); border-color:rgba(0,212,255,0.5); transform:translateY(-1px); }
+
+/* ═══ MAIN AREA ═══ */
+.main { flex:1; padding:28px; display:flex; flex-direction:column; gap:20px; max-width:1300px; margin:auto; width:100%; }
+
+/* ═══ TOP HERO STRIP ═══ */
+.hero-strip {
+  border-radius:24px; padding:32px 36px;
+  position:relative; overflow:hidden;
+  display:none;
+  animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both;
+}
+.hero-strip.scam {
+  background:linear-gradient(135deg, rgba(255,30,60,0.18) 0%, rgba(15,8,20,0.95) 60%);
+  border:1px solid rgba(255,69,96,0.25);
+  box-shadow:0 0 60px rgba(255,69,96,0.12), inset 0 1px 0 rgba(255,120,140,0.15);
+}
+.hero-strip.legit {
+  background:linear-gradient(135deg, rgba(0,200,120,0.15) 0%, rgba(8,18,30,0.95) 60%);
+  border:1px solid rgba(0,224,150,0.22);
+  box-shadow:0 0 60px rgba(0,224,150,0.1), inset 0 1px 0 rgba(0,255,160,0.12);
+}
+/* big emoji watermark */
+.hero-strip::after {
+  content:attr(data-icon); position:absolute; right:32px; top:50%;
+  transform:translateY(-50%); font-size:120px; opacity:.07; pointer-events:none;
+  line-height:1;
+}
+.hero-inner { display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.hero-left { flex:1; }
+.hero-tag {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:5px 16px; border-radius:100px;
+  font-family:'Syne',sans-serif; font-size:10px; font-weight:800;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.hero-tag.scam { background:rgba(255,69,96,0.15); border:1px solid rgba(255,69,96,0.4); color:#ff8090; }
+.hero-tag.legit { background:rgba(0,224,150,0.12); border:1px solid rgba(0,224,150,0.38); color:var(--green); }
+.hero-title {
+  font-family:'Syne',sans-serif; font-weight:900;
+  font-size:clamp(30px,4vw,42px); line-height:1.08; letter-spacing:-.8px;
+  margin-bottom:10px;
+}
+.hero-title.scam { color:#ff4560; }
+.hero-title.legit { color:var(--green); }
+.hero-sub { font-size:14px; color:var(--sub); max-width:500px; line-height:1.6; }
+
+.hero-right { text-align:right; flex-shrink:0; }
+.conf-ring {
+  position:relative; width:120px; height:120px; margin:0 0 0 auto;
+}
+.conf-ring svg { width:100%; height:100%; transform:rotate(-90deg); }
+.conf-ring-track { fill:none; stroke:rgba(255,255,255,0.07); stroke-width:8; }
+.conf-ring-fill  { fill:none; stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset 1.4s cubic-bezier(.22,1,.36,1); }
+.conf-ring-fill.scam  { stroke:url(#ringGradScam); }
+.conf-ring-fill.legit { stroke:url(#ringGradLegit); }
+.conf-center {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+}
+.conf-pct {
+  font-family:'Syne',sans-serif; font-weight:900; font-size:24px; line-height:1; letter-spacing:-1px;
+}
+.conf-pct.scam  { color:#ff4560; }
+.conf-pct.legit { color:var(--green); }
+.conf-lbl { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); font-family:var(--mono); margin-top:3px; }
+
+/* ═══ SIDE BY SIDE ═══ */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+/* ═══ PANEL (shared card style) ═══ */
+.panel {
+  border-radius:20px; border:1px solid rgba(0,212,255,0.14);
+  background:rgba(10,20,40,0.96); backdrop-filter:blur(24px);
+  overflow:hidden; position:relative;
+  box-shadow:0 4px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.04);
+  opacity:0; transform:translateY(16px);
+  transition:opacity .4s ease, transform .4s cubic-bezier(.22,1,.36,1);
+}
+.panel.in { opacity:1; transform:none; }
+.panel::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent 5%,rgba(0,212,255,0.6) 50%,transparent 95%);
+}
+
+.panel-hdr {
+  padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.05);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.panel-title {
+  font-family:'Syne',sans-serif; font-size:12px; font-weight:800;
+  letter-spacing:1.5px; text-transform:uppercase;
+  display:flex; align-items:center; gap:8px;
+}
+.panel-title.scam-t { color:#ff8090; }
+.panel-title.legit-t { color:var(--green); }
+.panel-title.neutral { color:var(--cyan); }
+
+/* ═══ METER PANEL ═══ */
+.meter-body { padding:22px; }
+.meter-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+.meter-safe   { font-weight:800; color:var(--green); font-family:'Syne',sans-serif; font-size:12px; display:flex; align-items:center; gap:6px; }
+.meter-danger { font-weight:800; color:var(--red);   font-family:'Syne',sans-serif; font-size:12px; display:flex; align-items:center; gap:6px; }
+.meter-safe::before   { content:'●'; color:var(--green); font-size:8px; text-shadow:0 0 8px var(--green); }
+.meter-danger::before { content:'●'; color:var(--red);   font-size:8px; text-shadow:0 0 8px var(--red); }
+.meter-val { font-family:var(--mono); font-size:13px; font-weight:700; }
+
+/* Risk level badge */
+.risk-level-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 14px; border-radius:100px;
+  font-family:'Syne',sans-serif; font-size:11px; font-weight:800;
+  letter-spacing:1px; text-transform:uppercase; margin-bottom:14px;
+}
+.risk-level-badge.low    { background:rgba(0,224,150,0.12); border:1px solid rgba(0,224,150,0.35); color:#00e096; }
+.risk-level-badge.medium { background:rgba(255,184,0,0.12); border:1px solid rgba(255,184,0,0.35); color:#ffb800; }
+.risk-level-badge.high   { background:rgba(255,100,0,0.12); border:1px solid rgba(255,100,0,0.35); color:#ff6400; }
+.risk-level-badge.critical { background:rgba(255,69,96,0.14); border:1px solid rgba(255,69,96,0.4); color:#ff4560; }
+
+.meter-track {
+  width:100%; height:16px; border-radius:20px;
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
+  position:relative; margin-bottom:10px;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,0.4);
+  overflow:hidden;
+}
+.meter-fill {
+  height:100%; width:0%; border-radius:20px;
+  transition:width 1.4s cubic-bezier(.22,1,.36,1);
+  position:relative;
+}
+.meter-fill::after {
+  content:''; position:absolute; top:0; left:0; right:0; bottom:0;
+  border-radius:20px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%);
+}
+.meter-ticks { display:flex; justify-content:space-between; margin-top:4px; }
+.meter-ticks span { font-family:var(--mono); font-size:9px; color:rgba(200,230,255,0.25); }
+
+/* Zone labels under meter */
+.meter-zones {
+  display:grid; grid-template-columns:1fr 1fr 1fr 1fr;
+  gap:6px; margin-top:12px;
+}
+.zone-item {
+  padding:6px 4px; border-radius:8px; text-align:center;
+  font-family:'Syne',sans-serif; font-size:9.5px; font-weight:800;
+  letter-spacing:.5px; text-transform:uppercase; border:1px solid transparent;
+  opacity:0.4; transition:opacity .3s, transform .3s;
+}
+.zone-item.active { opacity:1; transform:translateY(-2px); }
+.zone-item.z-low      { background:rgba(0,224,150,0.08);  border-color:rgba(0,224,150,0.25);  color:#00e096; }
+.zone-item.z-medium   { background:rgba(255,184,0,0.08);  border-color:rgba(255,184,0,0.25);  color:#ffb800; }
+.zone-item.z-high     { background:rgba(255,100,0,0.08);  border-color:rgba(255,100,0,0.25);  color:#ff6400; }
+.zone-item.z-critical { background:rgba(255,69,96,0.1);   border-color:rgba(255,69,96,0.3);   color:#ff4560; }
+
+/* verdict sub inside meter panel */
+.verdict-detail {
+  margin-top:18px; padding:14px 16px; border-radius:12px;
+  font-size:13px; line-height:1.7; color:var(--sub);
+  background:rgba(0,212,255,0.04); border:1px solid rgba(0,212,255,0.14);
+  font-weight:500;
+}
+
+/* ═══ SIGNALS PANEL ═══ */
+.signals-body { padding:14px 18px; display:flex; flex-direction:column; gap:7px; overflow-y:auto; max-height:360px; }
+.signals-body::-webkit-scrollbar { width:3px; }
+.signals-body::-webkit-scrollbar-thumb { background:rgba(0,212,255,0.2); border-radius:3px; }
+
+.sig-item {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:11px 14px; border-radius:11px;
+  font-size:13px; line-height:1.6; color:rgba(225,242,255,0.92);
+  font-weight:500;
+}
+.sig-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:6px; }
+.sig-item.red { background:rgba(255,69,96,0.1);  border:1px solid rgba(255,69,96,0.22); }
+.sig-item.grn { background:rgba(0,224,150,0.09);  border:1px solid rgba(0,224,150,0.22); }
+.sig-item.ylw { background:rgba(255,184,0,0.09);  border:1px solid rgba(255,184,0,0.22); }
+.sig-dot.red { background:var(--red);   box-shadow:0 0 8px var(--red); }
+.sig-dot.grn { background:var(--green); box-shadow:0 0 8px var(--green); }
+.sig-dot.ylw { background:var(--amber); box-shadow:0 0 8px var(--amber); }
+.sig-divider { font-size:11px; color:var(--muted); font-family:var(--mono); padding:6px 2px; letter-spacing:.5px; }
+
+/* ═══ TTS ═══ */
+.tts-btn {
+  display:inline-flex; align-items:center; gap:5px;
+  background:rgba(0,212,255,0.07); border:1px solid rgba(0,212,255,0.22);
+  color:var(--cyan); font-size:10.5px; font-weight:700;
+  padding:5px 12px; border-radius:100px; cursor:pointer;
+  transition:all .2s; font-family:'Syne',sans-serif;
+}
+.tts-btn:hover { background:rgba(0,212,255,0.14); }
+.tts-btn.playing { background:rgba(255,69,96,0.1); border-color:rgba(255,69,96,0.4); color:#ff8090; }
+.tts-wave { display:none; align-items:center; gap:2px; height:11px; }
+.tts-btn.playing .tts-wave { display:flex; }
+.tts-wave span { display:block; width:2px; border-radius:2px; background:#ff8090; animation:wave .8s ease-in-out infinite; }
+.tts-wave span:nth-child(1){height:3px;animation-delay:0s}
+.tts-wave span:nth-child(2){height:9px;animation-delay:.15s}
+.tts-wave span:nth-child(3){height:5px;animation-delay:.3s}
+.tts-wave span:nth-child(4){height:9px;animation-delay:.45s}
+.tts-wave span:nth-child(5){height:3px;animation-delay:.6s}
+@keyframes wave{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1.4)}}
+
+/* ── DOUBTFUL theme ── */
+.hero-strip.doubtful     { background: linear-gradient(135deg, rgba(255,140,0,0.22) 0%, rgba(255,184,0,0.10) 100%); border-color: rgba(255,184,0,0.35); }
+.hero-tag.doubtful       { background: rgba(255,184,0,0.15); border-color: rgba(255,184,0,0.4); color:#ffb800; }
+.hero-title.doubtful     { color:#ffb800; text-shadow:0 0 40px rgba(255,184,0,0.4); }
+.conf-pct.doubtful       { color:#ffb800; text-shadow:0 0 20px rgba(255,184,0,0.5); }
+.conf-ring-fill.doubtful { stroke: url(#ringGradDoubtful); }
+.panel-title.doubtful-t  { color:#ffb800; }
+.sum-val.doubtful        { color:#ffb800; text-shadow:0 0 10px rgba(255,184,0,0.4); }
+/* ═══ VOICE BAR ═══ */
+.voice-bar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 8px 14px; border-bottom: 1px solid rgba(255,255,255,0.05);
+  background: rgba(0,212,255,0.02);
+}
+.voice-select-wrap { position: relative; flex: 1; min-width: 140px; }
+.voice-select-wrap::after {
+  content:'▾'; position:absolute; right:9px; top:50%;
+  transform:translateY(-50%); color:var(--cyan); font-size:11px; pointer-events:none;
+}
+#voiceSelect {
+  width:100%; padding:6px 26px 6px 10px;
+  background:rgba(4,8,20,0.95); border:1px solid rgba(0,212,255,0.22);
+  border-radius:8px; color:#f0f8ff;
+  font-family:'DM Sans',sans-serif; font-size:11.5px; font-weight:500;
+  outline:none; cursor:pointer; appearance:none; transition:border-color .2s;
+}
+#voiceSelect:focus { border-color:rgba(0,212,255,0.5); }
+#voiceSelect option { background:#0d1a2e; color:#f0f8ff; }
+.voice-preview-btn {
+  display:flex; align-items:center; gap:5px;
+  padding:6px 12px; border-radius:8px;
+  background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.22);
+  color:var(--cyan); font-size:11px; font-weight:700;
+  cursor:pointer; transition:all .2s; font-family:'Syne',sans-serif; white-space:nowrap;
+}
+.voice-preview-btn:hover { background:rgba(0,212,255,0.18); }
+.voice-preview-btn.previewing { background:rgba(255,184,0,0.1); border-color:rgba(255,184,0,0.35); color:#ffb800; }
+.voice-speed-lbl { font-size:10.5px; color:var(--muted); white-space:nowrap; font-family:'JetBrains Mono',monospace; }
+
+.bottom-row { display:grid; grid-template-columns:1fr auto; gap:16px; align-items:stretch; }
+
+/* summary panel */
+.summary-panel { padding:18px 22px; }
+.summary-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.sum-item { padding:14px 16px; border-radius:12px; background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.12); }
+.sum-label { font-family:var(--mono); font-size:9.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+.sum-val { font-family:'Syne',sans-serif; font-weight:900; font-size:20px; }
+.sum-val.scam  { color:#ff4560; text-shadow:0 0 20px rgba(255,69,96,0.3); }
+.sum-val.legit { color:var(--green); text-shadow:0 0 20px rgba(0,224,150,0.3); }
+.sum-val.cyn   { color:var(--cyan); text-shadow:0 0 20px rgba(0,212,255,0.3); }
+
+/* actions panel */
+.actions-panel { padding:18px; display:flex; flex-direction:column; gap:10px; justify-content:center; }
+.act-btn {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  padding:12px 22px; border-radius:13px; border:none;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:13px;
+  cursor:pointer; transition:all .25s; white-space:nowrap;
+}
+.act-btn-primary {
+  background:linear-gradient(135deg,var(--blue),#0e9bdf,var(--cyan));
+  color:white; box-shadow:0 4px 18px rgba(0,212,255,0.22), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.act-btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(0,212,255,0.4); }
+.act-btn-danger {
+  background:linear-gradient(135deg,#bb1f00,#ff4560);
+  color:white; box-shadow:0 4px 18px rgba(255,69,96,0.22), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.act-btn-danger:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(255,69,96,0.4); }
+
+/* ═══ NO DATA ═══ */
+.no-data { display:none; text-align:center; padding:100px 20px; color:var(--muted); }
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:800px){
+  .two-col { grid-template-columns:1fr; }
+  .bottom-row { grid-template-columns:1fr; }
+  .hero-strip::after { display:none; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="starCanvas"></canvas>
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
+<!-- SVG gradient defs for ring -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="ringGradScam" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff6b00"/>
+      <stop offset="100%" stop-color="#ff4560"/>
+    </linearGradient>
+    <linearGradient id="ringGradLegit" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00c853"/>
+      <stop offset="100%" stop-color="#00e096"/>
+    </linearGradient>
+    <linearGradient id="ringGradDoubtful" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#ffb800"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="page">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">
+      <div class="logo-icon">🛡</div>
+      <span class="logo-text">JobShield AI</span>
+    </div>
+    <a class="back-btn" href="dashboard.html">← Back to Dashboard</a>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- NO DATA -->
+    <div class="no-data" id="noData">
+      <div style="font-size:52px;margin-bottom:16px;">🔍</div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:900;margin-bottom:8px;">No Result Found</div>
+      <div style="font-size:14px;margin-bottom:24px;">Analyze a job from the dashboard first.</div>
+      <a class="back-btn" href="dashboard.html">Go to Dashboard</a>
+    </div>
+
+    <!-- HERO STRIP -->
+    <div class="hero-strip" id="heroStrip" data-icon="🛡">
+      <div class="hero-inner">
+        <div class="hero-left">
+          <div class="hero-tag" id="heroTag">—</div>
+          <div class="hero-title" id="heroTitle">—</div>
+          <div class="hero-sub" id="heroSub">—</div>
+        </div>
+        <div class="hero-right">
+          <div class="conf-ring">
+            <svg viewBox="0 0 100 100">
+              <circle class="conf-ring-track" cx="50" cy="50" r="40"/>
+              <circle class="conf-ring-fill" id="ringFill" cx="50" cy="50" r="40"
+                stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+            </svg>
+            <div class="conf-center">
+              <div class="conf-pct" id="confPct">0%</div>
+              <div class="conf-lbl">Confidence</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TWO COLUMN -->
+    <div class="two-col" id="twoCol" style="display:none;">
+
+      <!-- LEFT — METER + DETAIL -->
+      <div class="panel" id="panelMeter">
+        <div class="panel-hdr">
+          <div class="panel-title neutral">📊 Risk Meter</div>
+        </div>
+        <div class="meter-body">
+          <div id="riskLevelBadge" class="risk-level-badge low">● Low Risk</div>
+          <div class="meter-row">
+            <span class="meter-safe">Safe</span>
+            <span class="meter-val" id="meterPct">—</span>
+            <span class="meter-danger">Danger</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill" id="meterFill"></div>
+          </div>
+          <div class="meter-ticks">
+            <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+          </div>
+          <div class="meter-zones">
+            <div class="zone-item z-low"      id="zLow">🟢 Low<br><span style="font-size:8px;opacity:.7">0–25%</span></div>
+            <div class="zone-item z-medium"   id="zMed">🟡 Medium<br><span style="font-size:8px;opacity:.7">26–55%</span></div>
+            <div class="zone-item z-high"     id="zHigh">🟠 High<br><span style="font-size:8px;opacity:.7">56–75%</span></div>
+            <div class="zone-item z-critical" id="zCrit">🔴 Critical<br><span style="font-size:8px;opacity:.7">76–100%</span></div>
+          </div>
+          <div class="verdict-detail" id="verdictDetail">—</div>
+        </div>
+      </div>
+
+      <!-- RIGHT — SIGNALS -->
+      <div class="panel" id="panelSignals">
+        <div class="panel-hdr">
+          <div class="panel-title" id="signalsTitle">🤖 AI Analysis</div>
+          <button class="tts-btn" id="ttsBtn" onclick="toggleTTS()">
+            <span id="ttsIcon">🔊</span>
+            <span id="ttsTxt">Read Aloud</span>
+            <div class="tts-wave"><span></span><span></span><span></span><span></span><span></span></div>
+          </button>
+        </div>
+        <!-- VOICE SELECTOR -->
+        <div class="voice-bar" id="voiceBar">
+          <div class="voice-select-wrap">
+            <select id="voiceSelect" title="Choose voice">
+              <option value="">⏳ Loading voices...</option>
+            </select>
+          </div>
+          <button class="voice-preview-btn" id="previewBtn" onclick="previewVoice()">▶ Preview</button>
+          <span class="voice-speed-lbl">1.1× speed</span>
+        </div>
+        <div class="signals-body" id="signalsBody"></div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM ROW -->
+    <div class="bottom-row" id="bottomRow" style="display:none;">
+
+      <!-- SUMMARY -->
+      <div class="panel summary-panel" id="panelSummary">
+        <div class="summary-grid">
+          <div class="sum-item">
+            <div class="sum-label">Verdict</div>
+            <div class="sum-val" id="sumVerdict" style="font-size:15px;">—</div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-label">AI Score</div>
+            <div class="sum-val" id="sumScore">—</div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-label">Scam Risk</div>
+            <div class="sum-val" id="sumRisk">—</div>
+          </div>
+          <div class="sum-item">
+            <div class="sum-label">Status</div>
+            <div class="sum-val cyn" id="sumStatus" style="font-size:14px;">Analyzed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="panel actions-panel" id="panelActions">
+        <button class="act-btn act-btn-primary" onclick="window.location.href='dashboard.html'">
+          🔍 Analyze Another
+        </button>
+        <button class="act-btn act-btn-danger" id="pdfBtn">
+          ⬇ Download PDF
+        </button>
+      </div>
+
+    </div>
+
+  </div><!-- end main -->
+</div><!-- end page -->
+
+<script>
+const API = "http://127.0.0.1:5000";
+let ttsPlaying = false;
+let ttsText    = "";
+let allVoices  = [];
+
+// ── VOICE SELECTOR ──
+function loadVoices(){
+  allVoices = speechSynthesis.getVoices();
+  if(!allVoices.length) return;
+  const sel   = document.getElementById("voiceSelect");
+  const saved = localStorage.getItem("tts_voice_name");
+  sel.innerHTML = "";
+  const preferred = allVoices.filter(v => v.lang.startsWith("en") || v.lang.startsWith("hi"));
+  const rest      = allVoices.filter(v => !v.lang.startsWith("en") && !v.lang.startsWith("hi"));
+  if(preferred.length){
+    const grp = document.createElement("optgroup"); grp.label = "🌟 Recommended";
+    preferred.forEach(v => {
+      const opt = document.createElement("option");
+      opt.value = v.name; opt.textContent = `${v.name} (${v.lang})`;
+      if(saved && v.name === saved) opt.selected = true;
+      grp.appendChild(opt);
+    });
+    sel.appendChild(grp);
+  }
+  if(rest.length){
+    const grp = document.createElement("optgroup"); grp.label = "Other Languages";
+    rest.forEach(v => {
+      const opt = document.createElement("option");
+      opt.value = v.name; opt.textContent = `${v.name} (${v.lang})`;
+      if(saved && v.name === saved) opt.selected = true;
+      grp.appendChild(opt);
+    });
+    sel.appendChild(grp);
+  }
+}
+speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("voiceSelect").addEventListener("change", function(){
+    localStorage.setItem("tts_voice_name", this.value);
+  });
+});
+
+function getSelectedVoice(){
+  const name = document.getElementById("voiceSelect").value;
+  if(!name) return null;
+  return allVoices.find(v => v.name === name) || null;
+}
+
+function previewVoice(){
+  speechSynthesis.cancel();
+  const btn = document.getElementById("previewBtn");
+  const u = new SpeechSynthesisUtterance("This is how the selected voice sounds. JobShield AI is protecting you.");
+  const v = getSelectedVoice();
+  if(v) u.voice = v;
+  u.rate=1.1; u.pitch=1;
+  u.onstart = () => { btn.classList.add("previewing"); btn.textContent = "⏹ Playing..."; };
+  u.onend   = () => { btn.classList.remove("previewing"); btn.textContent = "▶ Preview"; };
+  u.onerror = () => { btn.classList.remove("previewing"); btn.textContent = "▶ Preview"; };
+  speechSynthesis.speak(u);
+}
+
+function toggleTTS(){
+  if(ttsPlaying){ speechSynthesis.cancel(); setTTSState(false); return; }
+  if(!ttsText) return;
+  const utt = new SpeechSynthesisUtterance(ttsText);
+  utt.rate=1.1; utt.pitch=1;
+  const v = getSelectedVoice();
+  if(v) utt.voice = v;
+  else  utt.lang  = "en-IN";
+  utt.onstart = () => setTTSState(true);
+  utt.onend   = () => setTTSState(false);
+  utt.onerror = () => setTTSState(false);
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utt);
+}
+function setTTSState(playing){
+  ttsPlaying = playing;
+  const btn=document.getElementById("ttsBtn");
+  document.getElementById("ttsIcon").textContent = playing ? "⏹" : "🔊";
+  document.getElementById("ttsTxt").textContent  = playing ? "Stop" : "Read Aloud";
+  playing ? btn.classList.add("playing") : btn.classList.remove("playing");
+}
+
+// Stars
+(function(){
+  const canvas=document.getElementById("starCanvas"), ctx=canvas.getContext("2d");
+  let stars=[],meteors=[],W,H;
+  function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+  function init(){
+    stars=[];
+    for(let i=0;i<Math.floor((W*H)/5500);i++) stars.push({
+      x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.5+0.15,
+      alpha:Math.random(), delta:(Math.random()*.007+.002)*(Math.random()<.5?1:-1),
+      color:Math.random()<.15?"#00d4ff":Math.random()<.1?"#1a5cff":"#fff"
+    });
+  }
+  function spawnMeteor(){
+    meteors.push({x:Math.random()*W*.7,y:-20,len:Math.random()*90+50,speed:Math.random()*3+2,a:1});
+  }
+  setInterval(spawnMeteor,3200); spawnMeteor();
+  function draw(){
+    if(!W||!H){requestAnimationFrame(draw);return;}
+    ctx.clearRect(0,0,W,H);
+    const g1=ctx.createRadialGradient(W*.2,H*.1,0,W*.2,H*.1,W*.4);
+    g1.addColorStop(0,"rgba(26,92,255,0.14)"); g1.addColorStop(1,"transparent");
+    ctx.fillStyle=g1; ctx.fillRect(0,0,W,H);
+    for(let s of stars){
+      s.alpha=Math.max(.04,Math.min(1,s.alpha+s.delta));
+      if(s.alpha<=.04||s.alpha>=1) s.delta*=-1;
+      ctx.save(); ctx.globalAlpha=s.alpha;
+      if(s.r>1.1){ctx.shadowBlur=s.r*5;ctx.shadowColor=s.color;}
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=s.color; ctx.fill(); ctx.restore();
+    }
+    meteors=meteors.filter(m=>m.a>.02);
+    for(let m of meteors){
+      m.x+=Math.cos(Math.PI/5)*m.speed; m.y+=Math.sin(Math.PI/5)*m.speed; m.a-=.011;
+      const tx=m.x-Math.cos(Math.PI/5)*m.len, ty=m.y-Math.sin(Math.PI/5)*m.len;
+      if(!isFinite(tx)||!isFinite(ty)||!isFinite(m.x)||!isFinite(m.y)) continue;
+      try{
+        const g=ctx.createLinearGradient(tx,ty,m.x,m.y);
+        g.addColorStop(0,"rgba(255,255,255,0)"); g.addColorStop(1,`rgba(0,212,255,${m.a.toFixed(3)})`);
+        ctx.save(); ctx.globalAlpha=m.a; ctx.shadowBlur=4; ctx.shadowColor="#00d4ff";
+        ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(m.x,m.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(m.x,m.y,1.1,0,Math.PI*2); ctx.fillStyle="#fff"; ctx.fill();
+        ctx.restore();
+      }catch(e){}
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener("resize",()=>{resize();init();});
+  resize(); init(); draw();
+})();
+
+// Stagger panels in
+function revealPanels(){
+  const items=[
+    document.getElementById("panelMeter"),
+    document.getElementById("panelSignals"),
+    document.getElementById("panelSummary"),
+    document.getElementById("panelActions"),
+  ];
+  items.forEach((el,i)=>{ if(el) setTimeout(()=>el.classList.add("in"), 100+i*90); });
+}
+
+// Animate confidence ring
+function animateRing(pct, isScam, isDoubtful){
+  const circle = document.getElementById("ringFill");
+  const r = 40, circ = 2*Math.PI*r;
+  circle.className = "conf-ring-fill " + (isScam?"scam":isDoubtful?"doubtful":"legit");
+  circle.style.strokeDasharray  = circ;
+  circle.style.strokeDashoffset = circ;
+  setTimeout(()=>{
+    circle.style.transition = "stroke-dashoffset 1.4s cubic-bezier(.22,1,.36,1)";
+    circle.style.strokeDashoffset = circ - (pct/100)*circ;
+  }, 200);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const raw = localStorage.getItem("jobshield_result");
+  if(!raw){ document.getElementById("noData").style.display="block"; return; }
+  let d;
+  try{ d=JSON.parse(raw); } catch{ document.getElementById("noData").style.display="block"; return; }
+  localStorage.removeItem("jobshield_result");
+
+  const isScam     = d.label === "Scam Job";
+  const isDoubtful = d.label === "Doubtful";
+  const scamProb = d.scamProb || 0;
+  const conf     = d.conf || "0%";
+  const confNum  = parseFloat(conf);
+  const scamSigs = d.scamSignals  || [];
+  const legitSigs= d.legitSignals || [];
+
+  // theme helper
+  const theme = isScam ? "scam" : isDoubtful ? "doubtful" : "legit";
+
+  // HERO STRIP
+  const hero = document.getElementById("heroStrip");
+  hero.className = "hero-strip " + theme;
+  hero.setAttribute("data-icon", isScam?"🚨":isDoubtful?"⚠️":"✅");
+  document.getElementById("heroTag").className   = "hero-tag " + theme;
+  document.getElementById("heroTag").innerText   = isScam?"🚨 Scam Detected":isDoubtful?"⚠️ Doubtful Job":"✅ Legitimate Job";
+  document.getElementById("heroTitle").className = "hero-title " + theme;
+  document.getElementById("heroTitle").innerText = isScam?"This looks like a Scam!":isDoubtful?"Proceed with Caution!":"This looks Legitimate!";
+  document.getElementById("heroSub").innerText   = isScam
+    ?"⛔ Do NOT pay any fees or share personal details with this employer."
+    :isDoubtful
+    ?"⚠️ Mixed signals found — verify the company thoroughly before applying."
+    :"✅ Still verify the company independently before applying.";
+  document.getElementById("confPct").className   = "conf-pct " + theme;
+  document.getElementById("confPct").innerText   = conf;
+  hero.style.display = "block";
+  animateRing(confNum, isScam, isDoubtful);
+
+  // METER — dynamic color by risk level
+  const fill = document.getElementById("meterFill");
+  fill.style.transition="none"; fill.style.width="0%";
+
+  let meterGradient, riskLabel, riskClass;
+  if(scamProb <= 25){
+    meterGradient = "linear-gradient(90deg,#00c853,#00e096)";
+    riskLabel = "● Low Risk"; riskClass = "low";
+    document.getElementById("zLow").classList.add("active");
+  } else if(scamProb <= 55){
+    meterGradient = "linear-gradient(90deg,#f9a825,#ffb800)";
+    riskLabel = "● Medium Risk"; riskClass = "medium";
+    document.getElementById("zMed").classList.add("active");
+  } else if(scamProb <= 75){
+    meterGradient = "linear-gradient(90deg,#e65100,#ff6400)";
+    riskLabel = "● High Risk"; riskClass = "high";
+    document.getElementById("zHigh").classList.add("active");
+  } else {
+    meterGradient = "linear-gradient(90deg,#c62828,#ff4560)";
+    riskLabel = "● Critical Risk"; riskClass = "critical";
+    document.getElementById("zCrit").classList.add("active");
+  }
+
+  fill.style.background = meterGradient;
+  const badge = document.getElementById("riskLevelBadge");
+  badge.textContent = riskLabel;
+  badge.className = "risk-level-badge " + riskClass;
+
+  document.getElementById("meterPct").innerText   = scamProb+"% scam risk";
+  document.getElementById("meterPct").style.color = riskClass==="low"?"#00e096":riskClass==="medium"?"#ffb800":riskClass==="high"?"#ff6400":"#ff4560";
+  document.getElementById("verdictDetail").innerText = isScam
+    ?"⛔ Do NOT share personal details, pay any registration/training fees, or trust promises of unrealistic income."
+    :isDoubtful
+    ?"⚠️ This job has mixed signals. Verify company on LinkedIn, check official website, and never pay any fees."
+    :"✅ This job appears legitimate. Verify company details on LinkedIn or official website before applying.";
+
+  // SIGNALS
+  const st = document.getElementById("signalsTitle");
+  st.className = "panel-title " + (isScam?"scam-t":isDoubtful?"doubtful-t":"legit-t");
+  st.innerHTML = isScam?"🚨 Suspicious Indicators":isDoubtful?"⚠️ Mixed Signals Found":"✅ Credibility Indicators";
+
+  let html="";
+  const primary=isScam?scamSigs:legitSigs, secondary=isScam?legitSigs:scamSigs;
+  for(let sig of primary){
+    let cls=isScam?"red":"grn"; if(sig.startsWith("🟡")) cls="ylw";
+    html+=`<div class="sig-item ${cls}"><div class="sig-dot ${cls}"></div><div>${sig}</div></div>`;
+  }
+  if(isDoubtful && scamSigs.length){
+    for(let sig of scamSigs){
+      let cls="red"; if(sig.startsWith("🟡")) cls="ylw";
+      html+=`<div class="sig-item ${cls}"><div class="sig-dot ${cls}"></div><div>${sig}</div></div>`;
+    }
+  }
+  if(!isDoubtful && secondary.length){
+    html+=`<div class="sig-divider">${isScam?"Also found:":"Minor concerns:"}</div>`;
+    for(let sig of secondary){
+      let cls=isScam?"grn":"red"; if(sig.startsWith("🟡")) cls="ylw";
+      html+=`<div class="sig-item ${cls}"><div class="sig-dot ${cls}"></div><div>${sig}</div></div>`;
+    }
+  }
+  document.getElementById("signalsBody").innerHTML=html;
+
+  // SUMMARY
+  const sv = document.getElementById("sumVerdict");
+  sv.className="sum-val "+theme;
+  sv.innerText = isScam?"SCAM JOB":isDoubtful?"DOUBTFUL":"LEGIT JOB";
+  const ss = document.getElementById("sumScore");
+  ss.className="sum-val "+theme;
+  ss.innerText=conf;
+  const sr = document.getElementById("sumRisk");
+  sr.className="sum-val "+theme;
+  sr.innerText=scamProb+"%";
+
+  // PDF
+  if(d.reportId){
+    document.getElementById("pdfBtn").onclick=()=>window.open(API+"/reports/"+d.reportId+"/download","_blank");
+  } else {
+    document.getElementById("pdfBtn").style.display="none";
+  }
+
+  // TTS
+  ttsText = isScam
+    ?`Warning! This job is a scam. Confidence ${conf}. Scam risk ${scamProb} percent. `
+    :isDoubtful
+    ?`Caution! This job is doubtful. Risk score ${scamProb} percent. Verify carefully before applying. `
+    :`This job looks legitimate. Confidence ${conf}. Scam risk ${scamProb} percent. `;
+  (isScam?scamSigs:isDoubtful?[...scamSigs,...legitSigs]:legitSigs).forEach(s=>{ttsText+=s.replace(/^[^\s]+\s/u,"")+". ";});
+  ttsText+=isScam?"Do not share personal details or pay any fees.":isDoubtful?"Verify the company before sharing any details.":"Still verify the company before applying.";
+
+  // Show everything
+  document.getElementById("twoCol").style.display="grid";
+  document.getElementById("bottomRow").style.display="grid";
+  revealPanels();
+
+  // Animate meter + ring
+  setTimeout(()=>{
+    fill.style.transition="width 1.4s cubic-bezier(.22,1,.36,1)";
+    fill.style.width=scamProb+"%";
+  },250);
+});
+</script>
+</body>
+</html>

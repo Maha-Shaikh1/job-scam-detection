@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us | JobShield AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#060d1a;
+  --blue:#1a5aff;
+  --cyan:#00d4ff;
+  --sky:#38bdf8;
+  --border:rgba(0,212,255,0.13);
+  --text:#e8f4ff;
+  --muted:rgba(210,235,255,0.70);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--void);color:var(--text);overflow-x:hidden}
+
+/* ── BG ── */
+#mesh{
+  position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 60% at 10% 10%,rgba(26,90,255,.32) 0%,transparent 60%),
+    radial-gradient(ellipse 55% 50% at 90% 20%,rgba(0,212,255,.2) 0%,transparent 55%),
+    radial-gradient(ellipse 60% 55% at 50% 95%,rgba(26,90,255,.2) 0%,transparent 60%),
+    var(--void);
+  animation:hue 22s ease-in-out infinite alternate;
+}
+@keyframes hue{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(14deg)}}
+
+canvas#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ── NAVBAR ── */
+.navbar{
+  position:fixed;top:0;width:100%;z-index:200;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 60px;height:68px;
+  background:rgba(6,13,26,0.78);backdrop-filter:blur(28px);
+  border-bottom:1px solid var(--border);transition:.4s;
+}
+.navbar.scrolled{background:rgba(6,13,26,.97);box-shadow:0 8px 40px rgba(0,212,255,.07)}
+.logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:900;display:flex;align-items:center;gap:9px;text-decoration:none;color:white}
+.logo-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 20px rgba(0,212,255,.38)}
+.logo span{background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-links a{color:rgba(220,240,255,.82);text-decoration:none;font-size:13.5px;font-weight:500;padding:6px 14px;border-radius:8px;transition:.22s}
+.nav-links a:hover{color:white;background:rgba(0,212,255,.08)}
+.nav-links a.active{color:var(--cyan)}
+.nav-cta{padding:8px 22px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--cyan));color:white;font-weight:600;font-size:13.5px;box-shadow:0 0 22px rgba(0,212,255,.3);transition:.3s;text-decoration:none}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 28px rgba(0,212,255,.5)}
+
+/* ── PAGE ── */
+.page{
+  position:relative;z-index:1;
+  min-height:100vh;padding-top:68px;
+  display:flex;align-items:center;justify-content:center;
+  padding-bottom:40px;
+}
+
+/* ── SCENE (perspective wrapper) ── */
+.scene{perspective:1200px;perspective-origin:50% 50%;padding:40px 20px}
+
+/* ── TILT CARD ── */
+.tilt-wrap{transform-style:preserve-3d;transition:transform .08s ease-out;will-change:transform}
+
+.card{
+  width:min(860px,92vw);
+  background:rgba(8,16,36,0.88);
+  border:1px solid rgba(0,212,255,.2);
+  border-radius:28px;
+  backdrop-filter:blur(28px);
+  box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 0 1px rgba(0,212,255,.08),inset 0 1px 0 rgba(0,212,255,.1);
+  overflow:hidden;transform-style:preserve-3d;position:relative;
+}
+.card-sheen{
+  position:absolute;inset:0;border-radius:28px;pointer-events:none;z-index:10;
+  background:radial-gradient(ellipse 60% 40% at var(--mx,50%) var(--my,30%),rgba(0,212,255,.07),transparent 65%);
+  transition:background .12s;
+}
+.card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--blue),var(--cyan),var(--sky),transparent);
+  z-index:5;
+}
+
+/* ── CARD INNER ── */
+.card-inner{display:grid;grid-template-columns:1fr 1fr;min-height:540px}
+@media(max-width:720px){.card-inner{grid-template-columns:1fr}}
+
+/* LEFT */
+.card-left{
+  padding:52px 44px;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;justify-content:center;
+  background:linear-gradient(160deg,rgba(26,90,255,.06),transparent 60%);
+}
+.tag{font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);margin-bottom:22px;display:flex;align-items:center;gap:8px;opacity:0;animation:up .6s .1s ease forwards}
+.tag::before{content:"";width:16px;height:1.5px;background:var(--cyan);border-radius:2px}
+.card-left h1{font-family:'Syne',sans-serif;font-size:clamp(34px,4vw,50px);font-weight:900;line-height:.9;letter-spacing:-2.5px;margin-bottom:22px;opacity:0;animation:up .7s .18s ease forwards}
+.h-w{display:block;color:white}
+.h-g{display:block;background:linear-gradient(110deg,var(--blue),var(--cyan),var(--sky),#fff);background-size:250%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 5s linear infinite}
+@keyframes shimmer{0%{background-position:0%}100%{background-position:200%}}
+.card-left p{font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:40px;opacity:0;animation:up .7s .28s ease forwards}
+
+.info-rows{display:flex;flex-direction:column;gap:12px;opacity:0;animation:up .7s .38s ease forwards}
+.irow{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;background:rgba(6,13,26,.8);border:1px solid var(--border);transition:.3s}
+.irow:hover{border-color:rgba(0,212,255,.35);transform:translateX(5px);box-shadow:0 4px 20px rgba(0,212,255,.1)}
+.irow-icon{width:38px;height:38px;flex-shrink:0;border-radius:11px;background:linear-gradient(135deg,rgba(26,90,255,.22),rgba(0,212,255,.14));border:1px solid rgba(0,212,255,.2);display:flex;align-items:center;justify-content:center;font-size:17px}
+.irow-txt label{font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--cyan);display:block;margin-bottom:2px}
+.irow-txt span{font-size:13.5px;color:var(--text);font-weight:500}
+
+/* login notice */
+.login-notice{
+  margin-top:28px;padding:14px 18px;border-radius:12px;
+  background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);
+  font-size:12.5px;color:var(--muted);line-height:1.6;
+  opacity:0;animation:up .7s .5s ease forwards;
+}
+.login-notice a{color:var(--cyan);text-decoration:none;font-weight:600}
+.login-notice a:hover{text-decoration:underline}
+
+.back-btn{display:inline-flex;align-items:center;gap:7px;margin-top:20px;color:var(--muted);font-size:13.5px;font-weight:500;text-decoration:none;transition:.25s;width:fit-content;opacity:0;animation:up .7s .56s ease forwards}
+.back-btn:hover{color:var(--cyan);transform:translateX(-4px)}
+
+/* RIGHT */
+.card-right{padding:52px 44px;display:flex;flex-direction:column;justify-content:center;gap:20px}
+.form-title{opacity:0;animation:up .7s .22s ease forwards}
+.form-title h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+.form-title p{font-size:13px;color:var(--muted)}
+
+.form{display:flex;flex-direction:column;gap:13px;opacity:0;animation:up .7s .34s ease forwards}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+@media(max-width:500px){.row2{grid-template-columns:1fr}}
+
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--cyan)}
+.field input,.field textarea,.field select{
+  background:rgba(6,13,26,.9);border:1px solid var(--border);border-radius:11px;
+  padding:12px 16px;color:var(--text);font-family:'DM Sans';font-size:14px;outline:none;transition:.3s;resize:none;
+}
+.field input::placeholder,.field textarea::placeholder{color:rgba(210,235,255,.25)}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:rgba(0,212,255,.5);box-shadow:0 0 0 3px rgba(0,212,255,.07);background:rgba(6,13,26,1)}
+.field textarea{height:96px}
+.field select{appearance:none;cursor:pointer;color:rgba(210,235,255,.6)}
+.field select option{background:#0a1628}
+
+/* disabled state */
+.field input:disabled,.field textarea:disabled,.field select:disabled{opacity:.4;cursor:not-allowed}
+
+.send-btn{
+  padding:14px;border-radius:13px;border:none;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  color:white;font-weight:700;font-size:15px;
+  cursor:pointer;font-family:'DM Sans';
+  box-shadow:0 0 28px rgba(0,212,255,.38);transition:.35s;
+  position:relative;overflow:hidden;
+}
+.send-btn::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,var(--cyan),var(--blue));opacity:0;transition:.35s}
+.send-btn:hover:not(:disabled)::before{opacity:1}
+.send-btn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 10px 44px rgba(0,212,255,.65)}
+.send-btn:disabled{opacity:.5;cursor:not-allowed;transform:none !important}
+.send-btn span{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:8px}
+.send-icon{display:inline-block;transition:.3s}
+.send-btn:hover:not(:disabled) .send-icon{transform:translateX(4px) rotate(-30deg)}
+
+/* loading spinner */
+.spinner{
+  width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:white;border-radius:50%;
+  animation:spin .7s linear infinite;display:none;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* toast */
+.toast{
+  position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(90px);
+  background:rgba(6,13,26,.97);border:1px solid rgba(0,212,255,.35);
+  border-radius:14px;padding:14px 28px;
+  font-size:14px;font-weight:600;color:var(--cyan);
+  box-shadow:0 8px 40px rgba(0,212,255,.2);
+  transition:.4s cubic-bezier(.16,1,.3,1);z-index:999;white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* footer */
+.footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:22px 60px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-logo{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px;text-decoration:none;color:white}
+.footer-icon{width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:11px}
+.footer-logo span{background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.footer-copy{font-size:12px;color:rgba(255,255,255,.2)}
+
+@keyframes up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div id="mesh"></div>
+<canvas id="particles"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="logo">
+    <div class="logo-icon">🛡</div>
+    Job<span>Shield</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="feature.html">Features</a>
+    <a href="about.html">About</a>
+    <a href="contact.html" class="active">Contact</a>
+    <a href="guidelines.html">Safety Guide</a>
+    <a href="resume-tips.html">Resume Tips</a>
+  </div>
+  <a href="login.html" class="nav-cta">Login →</a>
+</nav>
+
+<div class="page">
+  <div class="scene">
+    <div class="tilt-wrap" id="tiltWrap">
+      <div class="card" id="card">
+        <div class="card-sheen" id="sheen"></div>
+        <div class="card-inner">
+
+          <!-- LEFT -->
+          <div class="card-left">
+            <div class="tag">Get In Touch</div>
+            <h1>
+              <span class="h-w">Talk To</span>
+              <span class="h-g">JobShield</span>
+            </h1>
+            <p>Questions, feedback, or want to report a scam? Drop us a message — our team responds within 24 hours.</p>
+
+            <div class="info-rows">
+              <div class="irow">
+                <div class="irow-icon">📧</div>
+                <div class="irow-txt">
+                  <label>Email</label>
+                  <span>support@jobshieldai.com</span>
+                </div>
+              </div>
+              <div class="irow">
+                <div class="irow-icon">📞</div>
+                <div class="irow-txt">
+                  <label>Phone</label>
+                  <span>+91 9898 9898 90</span>
+                </div>
+              </div>
+              <div class="irow">
+                <div class="irow-icon">📍</div>
+                <div class="irow-txt">
+                  <label>Location</label>
+                  <span>Cyber Safety Lane, Tech City, India</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Login notice -->
+            <div class="login-notice" id="loginNotice" style="display:none">
+              ⚠️ You must be <a href="login.html">logged in</a> to send a message. Your identity is saved with your message.
+            </div>
+
+            <a href="index.html" class="back-btn">← Back to Home</a>
+          </div>
+
+          <!-- RIGHT: FORM -->
+          <div class="card-right">
+            <div class="form-title">
+              <h2>Send a Message</h2>
+              <p id="formSubtitle">We read every single one.</p>
+            </div>
+
+            <div class="form">
+              <div class="row2">
+                <div class="field">
+                  <label>Your Name</label>
+                  <input type="text" placeholder="e.g. Rahul Sharma" id="fn" disabled>
+                </div>
+                <div class="field">
+                  <label>Topic</label>
+                  <select id="ft" disabled>
+                    <option value="" disabled selected>Select topic...</option>
+                    <option>Report a Scam</option>
+                    <option>Technical Issue</option>
+                    <option>Feature Request</option>
+                    <option>General Inquiry</option>
+                    <option>Partnership</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label>Message</label>
+                <textarea placeholder="Tell us what's on your mind..." id="fm" disabled></textarea>
+              </div>
+              <button class="send-btn" id="sendBtn" onclick="handleSend()" disabled>
+                <span id="btnText">
+                  <span>Checking login...</span>
+                  <span class="spinner" id="spinner"></span>
+                </span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <a href="index.html" class="footer-logo">
+    <div class="footer-icon">🛡</div>
+    Job<span>Shield</span>
+  </a>
+  <div class="footer-copy">© 2026 JobShield AI — Recruitment Fraud Protection</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = "http://127.0.0.1:5000";
+
+/* ── PARTICLES ── */
+const pc=document.getElementById("particles"),px=pc.getContext("2d");
+let pts=[];
+function resizeP(){
+  pc.width=innerWidth;pc.height=innerHeight;pts=[];
+  const n=Math.floor(innerWidth*innerHeight/7000);
+  for(let i=0;i<n;i++){
+    pts.push({
+      x:Math.random()*pc.width,y:Math.random()*pc.height,
+      vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,
+      r:Math.random()*2+.5,
+      c:Math.random()<.4?"rgba(0,212,255,":"rgba(26,90,255,",
+      a:Math.random()*.6+.1
+    });
+  }
+}
+resizeP();addEventListener("resize",resizeP);
+(function animP(){
+  px.clearRect(0,0,pc.width,pc.height);
+  for(let i=0;i<pts.length;i++){
+    for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<120){px.beginPath();px.strokeStyle=`rgba(0,212,255,${.12*(1-dist/120)})`;px.lineWidth=.5;px.moveTo(pts[i].x,pts[i].y);px.lineTo(pts[j].x,pts[j].y);px.stroke()}
+    }
+  }
+  for(const p of pts){
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>pc.width)p.vx*=-1;
+    if(p.y<0||p.y>pc.height)p.vy*=-1;
+    px.beginPath();px.arc(p.x,p.y,p.r,0,Math.PI*2);
+    px.fillStyle=p.c+p.a+")";
+    if(p.r>1.2){px.shadowBlur=6;px.shadowColor=p.c+"0.6)"}
+    px.fill();px.shadowBlur=0;
+  }
+  requestAnimationFrame(animP);
+})();
+
+/* ── NAVBAR ── */
+addEventListener("scroll",()=>document.getElementById("navbar").classList.toggle("scrolled",scrollY>50));
+
+/* ── 3D TILT ── */
+const wrap=document.getElementById("tiltWrap"),sheen=document.getElementById("sheen"),MAX=14;
+document.querySelector(".page").addEventListener("mousemove",e=>{
+  const rect=wrap.getBoundingClientRect();
+  const dx=(e.clientX-rect.left-rect.width/2)/rect.width;
+  const dy=(e.clientY-rect.top-rect.height/2)/rect.height;
+  wrap.style.transform=`rotateX(${-dy*MAX}deg) rotateY(${dx*MAX}deg)`;
+  const mx=((e.clientX-rect.left)/rect.width)*100;
+  const my=((e.clientY-rect.top)/rect.height)*100;
+  sheen.style.background=`radial-gradient(ellipse 55% 40% at ${mx}% ${my}%,rgba(0,212,255,.1),transparent 65%)`;
+});
+document.querySelector(".page").addEventListener("mouseleave",()=>{
+  wrap.style.transform="rotateX(0deg) rotateY(0deg)";
+  sheen.style.background="none";
+});
+
+/* ── TOAST ── */
+function showToast(msg,type="success"){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.style.borderColor=type==="success"?"rgba(0,212,255,.35)":"rgba(251,191,36,.4)";
+  t.style.color=type==="success"?"var(--cyan)":"#fbbf24";
+  if(type==="error"){t.style.borderColor="rgba(239,68,68,.4)";t.style.color="#f87171"}
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),3500);
+}
+
+/* ── CHECK LOGIN SESSION ── */
+let loggedInUser = null;
+
+async function checkLogin(){
+  try{
+    const res = await fetch(`${API}/me`, {credentials:"include"});
+    if(res.ok){
+      const data = await res.json();
+      loggedInUser = data.username;
+      // Enable form
+      document.getElementById("fn").value = data.username;
+      document.getElementById("fn").disabled = true; // name is auto-filled from session
+      document.getElementById("ft").disabled = false;
+      document.getElementById("fm").disabled = false;
+      document.getElementById("sendBtn").disabled = false;
+      document.getElementById("sendBtn").querySelector("span").innerHTML = `Send Message <span class="send-icon">✈</span>`;
+      document.getElementById("formSubtitle").textContent = `Logged in as ${data.username} — we read every message.`;
+    } else {
+      // Not logged in
+      loggedInUser = null;
+      document.getElementById("loginNotice").style.display = "block";
+      document.getElementById("sendBtn").querySelector("span").innerHTML = `🔒 Login to Send Message`;
+      document.getElementById("sendBtn").onclick = ()=>{ window.location.href="login.html"; };
+      document.getElementById("sendBtn").disabled = false;
+      document.getElementById("formSubtitle").textContent = "Login required to send a message.";
+    }
+  } catch(e){
+    // Flask not running or network error
+    loggedInUser = null;
+    document.getElementById("loginNotice").style.display = "block";
+    document.getElementById("sendBtn").querySelector("span").innerHTML = `🔒 Login to Send Message`;
+    document.getElementById("sendBtn").onclick = ()=>{ window.location.href="login.html"; };
+    document.getElementById("sendBtn").disabled = false;
+  }
+}
+
+checkLogin();
+
+/* ── SEND MESSAGE ── */
+async function handleSend(){
+  if(!loggedInUser){ window.location.href="login.html"; return; }
+
+  const topic = document.getElementById("ft").value;
+  const msg   = document.getElementById("fm").value.trim();
+
+  if(!topic){ showToast("⚠️ Please select a topic.", "warn"); return; }
+  if(!msg){   showToast("⚠️ Message cannot be empty.", "warn"); return; }
+  if(msg.length < 10){ showToast("⚠️ Message too short.", "warn"); return; }
+
+  // Build full message string with topic prefix
+  const fullMessage = `[${topic}] ${msg}`;
+
+  // Loading state
+  const btn = document.getElementById("sendBtn");
+  btn.disabled = true;
+  btn.querySelector("span").innerHTML = `Sending... <span class="spinner" style="display:inline-block"></span>`;
+
+  try{
+    const res = await fetch(`${API}/report-admin`, {
+      method:"POST",
+      credentials:"include",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ message: fullMessage })
+    });
+
+    const data = await res.json();
+
+    if(res.ok && data.status === "success"){
+      showToast("✅ Message sent! Admin will review it soon.", "success");
+      document.getElementById("ft").selectedIndex = 0;
+      document.getElementById("fm").value = "";
+    } else if(data.error === "login"){
+      showToast("🔒 Session expired. Please login again.", "error");
+      setTimeout(()=>window.location.href="login.html", 1500);
+    } else {
+      showToast("❌ " + (data.message || "Something went wrong."), "error");
+    }
+  } catch(e){
+    showToast("❌ Could not reach server. Is Flask running?", "error");
+  }
+
+  // Reset button
+  btn.disabled = false;
+  btn.querySelector("span").innerHTML = `Send Message <span class="send-icon">✈</span>`;
+}
+</script>
+</body>
+</html>

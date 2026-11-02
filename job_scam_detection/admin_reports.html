@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobShield Admin | Reports</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#040a14;--blue:#1a5aff;--cyan:#00d4ff;
+  --green:#00c97e;--red:#f87171;--amber:#fbbf24;--purple:#a855f7;
+  --border:rgba(0,212,255,0.12);--text:#e8f4ff;--muted:rgba(210,235,255,0.55);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--void);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::after{content:"";position:fixed;inset:0;z-index:1000;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,.01) 2px,rgba(0,212,255,.01) 4px)}
+
+/* BG */
+#mesh{position:fixed;inset:0;z-index:0;background:
+  radial-gradient(ellipse 55% 45% at 0% 0%,rgba(26,90,255,0.2) 0%,transparent 55%),
+  radial-gradient(ellipse 45% 35% at 100% 100%,rgba(0,212,255,0.12) 0%,transparent 55%),
+  var(--void)}
+#grid{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.016;background-image:linear-gradient(rgba(0,212,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,1) 1px,transparent 1px);background-size:48px 48px}
+canvas#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* NAVBAR */
+.navbar{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:0 48px;height:64px;background:rgba(4,10,20,.94);backdrop-filter:blur(28px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:900;display:flex;align-items:center;gap:9px;color:white;text-decoration:none}
+.logo-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 0 18px rgba(0,212,255,.45)}
+.logo span{background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-right{display:flex;align-items:center;gap:4px}
+.nav-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;padding:3px 10px;border-radius:6px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--red);letter-spacing:1px;margin-right:8px}
+.nav-link{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;padding:6px 13px;border-radius:8px;transition:.22s}
+.nav-link:hover{color:white;background:rgba(0,212,255,.07)}
+.nav-link.active{color:var(--cyan)}
+.logout-btn{padding:7px 16px;border-radius:9px;border:1px solid rgba(248,113,113,.25);background:rgba(248,113,113,.06);color:var(--red);font-size:13px;cursor:pointer;font-family:'DM Sans';transition:.25s}
+.logout-btn:hover{background:rgba(248,113,113,.15)}
+
+/* MAIN */
+.main{position:relative;z-index:1;padding:32px 48px 60px;max-width:1400px;margin:0 auto}
+
+/* HEADER */
+.page-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;animation:rise .7s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.page-tag{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);display:block;margin-bottom:6px;font-family:'JetBrains Mono',monospace}
+.page-title{font-family:'Syne',sans-serif;font-size:clamp(22px,3vw,34px);font-weight:900;letter-spacing:-1.2px}
+.page-title span{background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.export-btn{padding:10px 22px;border-radius:11px;border:1px solid var(--border);background:rgba(0,212,255,.06);color:var(--cyan);font-size:13.5px;cursor:pointer;font-family:'DM Sans';font-weight:600;transition:.25s;display:flex;align-items:center;gap:7px}
+.export-btn:hover{background:rgba(0,212,255,.14);border-color:rgba(0,212,255,.3)}
+
+/* SUMMARY CHIPS */
+.summary-row{display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap;animation:rise .7s .05s ease both}
+.chip{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:11px;font-size:13px;font-weight:600;border:1px solid}
+.chip-all{background:rgba(0,212,255,.07);border-color:rgba(0,212,255,.2);color:var(--cyan)}
+.chip-scam{background:rgba(248,113,113,.07);border-color:rgba(248,113,113,.2);color:var(--red)}
+.chip-real{background:rgba(0,201,126,.07);border-color:rgba(0,201,126,.2);color:var(--green)}
+.chip span{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700}
+
+/* FILTERS */
+.filters{display:flex;align-items:center;gap:10px;margin-bottom:18px;animation:rise .7s .08s ease both;flex-wrap:wrap}
+.filter-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-right:4px}
+.filter-btn{padding:7px 16px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans';transition:.22s}
+.filter-btn:hover{border-color:rgba(0,212,255,.25);color:var(--text)}
+.filter-btn.active{background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.3);color:var(--cyan)}
+.filter-btn.active-scam{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.3);color:var(--red)}
+.filter-btn.active-real{background:rgba(0,201,126,.1);border-color:rgba(0,201,126,.3);color:var(--green)}
+.search-wrap{margin-left:auto}
+.search-input{background:rgba(6,13,26,.85);border:1px solid var(--border);border-radius:10px;padding:8px 14px;color:var(--text);font-family:'DM Sans';font-size:13.5px;outline:none;transition:.3s;width:200px}
+.search-input::placeholder{color:rgba(255,255,255,.2)}
+.search-input:focus{border-color:rgba(0,212,255,.4);width:240px}
+
+/* TABLE CARD */
+.table-card{background:rgba(8,15,30,0.9);border:1px solid var(--border);border-radius:20px;overflow:hidden;animation:rise .7s .12s ease both}
+
+/* TABLE HEADER */
+.table-top{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid var(--border)}
+.table-top h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:800}
+.total-badge{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;padding:3px 10px;border-radius:6px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--cyan)}
+
+table{width:100%;border-collapse:collapse}
+thead{background:rgba(0,212,255,.04)}
+th{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:14px 20px;text-align:left;font-family:'JetBrains Mono',monospace;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--cyan)}
+th .sort-icon{margin-left:4px;opacity:.4}
+th.sorted .sort-icon{opacity:1;color:var(--cyan)}
+td{padding:14px 20px;font-size:13.5px;border-bottom:1px solid rgba(255,255,255,.035);transition:.2s}
+tr:hover td{background:rgba(0,212,255,.025)}
+tr:last-child td{border-bottom:none}
+
+/* INDEX COL */
+.idx{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+.user-cell{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--sky)}
+.result-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;letter-spacing:.3px}
+.badge-scam{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.25);color:var(--red)}
+.badge-real{background:rgba(0,201,126,.12);border:1px solid rgba(0,201,126,.25);color:var(--green)}
+
+/* CONFIDENCE BAR */
+.conf-wrap{display:flex;align-items:center;gap:10px}
+.conf-bar-bg{width:80px;height:5px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+.conf-bar-fill{height:100%;border-radius:4px;transition:width .8s ease}
+.conf-num{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;min-width:38px}
+
+.date-cell{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+
+/* EMPTY / LOADING */
+.empty-row td{text-align:center;padding:56px;color:var(--muted);font-size:14px;font-style:italic}
+
+/* PAGINATION */
+.pagination{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-top:1px solid var(--border)}
+.page-info{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.page-btns{display:flex;gap:6px}
+.page-btn{padding:6px 13px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12.5px;cursor:pointer;transition:.22s;font-family:'DM Sans'}
+.page-btn:hover:not(:disabled){border-color:rgba(0,212,255,.3);color:var(--cyan)}
+.page-btn:disabled{opacity:.3;cursor:not-allowed}
+.page-btn.current{background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.3);color:var(--cyan)}
+
+/* FOOTER */
+.footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.footer-logo{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;display:flex;align-items:center;gap:6px;color:white;text-decoration:none}
+.fi{width:20px;height:20px;border-radius:5px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:9px}
+.footer-logo span{background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.footer-copy{font-size:11px;color:rgba(255,255,255,.14);font-family:'JetBrains Mono',monospace}
+</style>
+</head>
+<body>
+<div id="mesh"></div><div id="grid"></div><canvas id="stars"></canvas>
+
+<nav class="navbar">
+  <a href="admin.html" class="logo"><div class="logo-icon">🛡</div>Job<span>Shield</span></a>
+  <div class="nav-right">
+    <span class="nav-badge">ADMIN</span>
+    <a href="admin.html" class="nav-link">Dashboard</a>
+    <a href="admin_reports.html" class="nav-link active">Reports</a>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="main">
+
+  <div class="page-header">
+    <div>
+      <span class="page-tag">// JOB ANALYSIS</span>
+      <div class="page-title">All <span>Reports</span></div>
+    </div>
+    <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-row">
+    <div class="chip chip-all">Total <span id="cAll">—</span></div>
+    <div class="chip chip-scam">🚨 Scam <span id="cScam">—</span></div>
+    <div class="chip chip-real">✅ Legit <span id="cReal">—</span></div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active" id="fAll" onclick="setFilter('all')">All</button>
+    <button class="filter-btn" id="fScam" onclick="setFilter('scam')">🚨 Scam Only</button>
+    <button class="filter-btn" id="fReal" onclick="setFilter('real')">✅ Legit Only</button>
+    <div class="search-wrap">
+      <input type="text" class="search-input" placeholder="🔍 Search user..." id="searchBox" oninput="applySearch()">
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="table-top">
+      <h3>📊 Job Analysis Reports</h3>
+      <span class="total-badge" id="totalBadge">Loading...</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th onclick="sortBy('username')">User <span class="sort-icon" id="sort-username">↕</span></th>
+          <th onclick="sortBy('label')">Result <span class="sort-icon" id="sort-label">↕</span></th>
+          <th onclick="sortBy('confidence')">Confidence <span class="sort-icon" id="sort-confidence">↕</span></th>
+          <th onclick="sortBy('created_at')">Date <span class="sort-icon" id="sort-created_at">↕</span></th>
+        </tr>
+      </thead>
+      <tbody id="reportBody">
+        <tr class="empty-row"><td colspan="5">Loading reports...</td></tr>
+      </tbody>
+    </table>
+    <div class="pagination">
+      <span class="page-info" id="pageInfo">— of —</span>
+      <div class="page-btns" id="pageBtns"></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <a href="admin.html" class="footer-logo"><div class="fi">🛡</div>Job<span>Shield</span></a>
+  <div class="footer-copy">// REPORTS MODULE v2.0 — 2026</div>
+</footer>
+
+<script>
+const API="http://127.0.0.1:5000";
+let allData=[],filtered=[],currentFilter="all",sortKey="created_at",sortDir=-1,page=1;const PER_PAGE=15;
+
+/* STARS */
+const cv=document.getElementById("stars"),cx=cv.getContext("2d");let st=[];
+function rsz(){cv.width=innerWidth;cv.height=innerHeight;st=[];const n=Math.floor(innerWidth*innerHeight/6000);for(let i=0;i<n;i++){const r=Math.random();st.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.2+.1,a:Math.random(),d:(Math.random()*.004+.001)*(Math.random()<.5?1:-1),c:r<.18?"#00d4ff":r<.32?"#1a5aff":"#ffffff"});}}
+rsz();addEventListener("resize",rsz);
+(function draw(){cx.clearRect(0,0,cv.width,cv.height);for(const s of st){s.a=Math.max(.03,Math.min(1,s.a+s.d));if(s.a<=.03||s.a>=1)s.d*=-1;cx.save();cx.globalAlpha=s.a;if(s.r>1){cx.shadowBlur=s.r*4;cx.shadowColor=s.c}cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle=s.c;cx.fill();cx.restore();}requestAnimationFrame(draw);})();
+
+/* LOAD */
+async function loadReports(){
+  try{
+    const r=await fetch(API+"/admin/all-reports",{credentials:"include"});
+    const d=await r.json();
+    if(d.error){window.location.href="admin_login.html";return;}
+    allData=d;
+    const scam=d.filter(x=>x.label==="Scam Job").length;
+    const real=d.filter(x=>x.label!=="Scam Job").length;
+    document.getElementById("cAll").textContent=d.length;
+    document.getElementById("cScam").textContent=scam;
+    document.getElementById("cReal").textContent=real;
+    applyFilter();
+  }catch{document.getElementById("reportBody").innerHTML='<tr class="empty-row"><td colspan="5">Error loading reports.</td></tr>';}
+}
+
+function setFilter(f){
+  currentFilter=f;page=1;
+  document.querySelectorAll(".filter-btn").forEach(b=>b.className="filter-btn");
+  if(f==="all"){document.getElementById("fAll").className="filter-btn active";}
+  else if(f==="scam"){document.getElementById("fScam").className="filter-btn active-scam active";}
+  else{document.getElementById("fReal").className="filter-btn active-real active";}
+  applyFilter();
+}
+
+function applySearch(){page=1;applyFilter();}
+
+function applyFilter(){
+  const q=document.getElementById("searchBox").value.toLowerCase();
+  filtered=allData.filter(r=>{
+    const matchFilter=currentFilter==="all"||(currentFilter==="scam"&&r.label==="Scam Job")||(currentFilter==="real"&&r.label!=="Scam Job");
+    const matchSearch=!q||r.username.toLowerCase().includes(q);
+    return matchFilter&&matchSearch;
+  });
+  filtered.sort((a,b)=>{
+    let av=a[sortKey],bv=b[sortKey];
+    if(sortKey==="confidence"){av=parseFloat(av)||0;bv=parseFloat(bv)||0;}
+    return av>bv?sortDir:av<bv?-sortDir:0;
+  });
+  renderTable();
+}
+
+function sortBy(key){
+  if(sortKey===key)sortDir*=-1;else{sortKey=key;sortDir=-1;}
+  document.querySelectorAll(".sort-icon").forEach(el=>el.textContent="↕");
+  const el=document.getElementById("sort-"+key);
+  if(el)el.textContent=sortDir===1?"↑":"↓";
+  document.querySelectorAll("th").forEach(th=>th.classList.remove("sorted"));
+  applyFilter();
+}
+
+function renderTable(){
+  const total=filtered.length;
+  const pages=Math.ceil(total/PER_PAGE)||1;
+  if(page>pages)page=1;
+  const start=(page-1)*PER_PAGE,end=Math.min(start+PER_PAGE,total);
+  const slice=filtered.slice(start,end);
+  document.getElementById("totalBadge").textContent=`${total} records`;
+  document.getElementById("pageInfo").textContent=total?`${start+1}–${end} of ${total}`:"No results";
+
+  if(!slice.length){document.getElementById("reportBody").innerHTML='<tr class="empty-row"><td colspan="5">No records found.</td></tr>';document.getElementById("pageBtns").innerHTML="";return;}
+
+  document.getElementById("reportBody").innerHTML=slice.map((r,i)=>{
+    const isScam=r.label==="Scam Job";
+    const conf=parseFloat(r.confidence)||0;
+    const barColor=isScam?"rgba(248,113,113,.8)":"rgba(0,201,126,.8)";
+    return `<tr>
+      <td class="idx">${start+i+1}</td>
+      <td class="user-cell">${r.username}</td>
+      <td><span class="result-badge ${isScam?"badge-scam":"badge-real"}">${isScam?"🚨 Scam":"✅ Legit"}</span></td>
+      <td><div class="conf-wrap"><div class="conf-bar-bg"><div class="conf-bar-fill" style="width:${conf}%;background:${barColor}"></div></div><span class="conf-num" style="color:${barColor}">${conf}%</span></div></td>
+      <td class="date-cell">${r.created_at||"—"}</td>
+    </tr>`;
+  }).join("");
+
+  // PAGINATION
+  const btns=[];
+  if(pages<=7){for(let i=1;i<=pages;i++)btns.push(i);}
+  else{btns.push(1);if(page>3)btns.push("…");for(let i=Math.max(2,page-1);i<=Math.min(pages-1,page+1);i++)btns.push(i);if(page<pages-2)btns.push("…");btns.push(pages);}
+  document.getElementById("pageBtns").innerHTML=`
+    <button class="page-btn" onclick="goPage(${page-1})" ${page===1?"disabled":""}>←</button>
+    ${btns.map(b=>b==="…"?`<span style="color:var(--muted);padding:0 4px">…</span>`:`<button class="page-btn ${b===page?"current":""}" onclick="goPage(${b})">${b}</button>`).join("")}
+    <button class="page-btn" onclick="goPage(${page+1})" ${page===pages?"disabled":""}>→</button>`;
+}
+
+function goPage(p){const pages=Math.ceil(filtered.length/PER_PAGE)||1;if(p<1||p>pages)return;page=p;renderTable();}
+
+/* EXPORT CSV */
+function exportCSV(){
+  const rows=[["#","User","Result","Confidence","Date"],...filtered.map((r,i)=>[i+1,r.username,r.label,r.confidence+"%",r.created_at||""])];
+  const csv=rows.map(r=>r.map(c=>`"${c}"`).join(",")).join("\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="jobshield_reports.csv";a.click();
+}
+
+async function logout(){await fetch(API+"/logout",{method:"POST",credentials:"include"});window.location.href="admin_login.html";}
+loadReports();
+</script>
+</body>
+</html>

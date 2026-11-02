@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login | JobShield AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #071020;
+  --blue: #1a5aff;
+  --cyan: #00d4ff;
+  --red: #ff4444;
+  --red-dim: rgba(255,68,68,0.12);
+  --amber: #f59e0b;
+  --border: rgba(0,212,255,0.12);
+  --border-h: rgba(0,212,255,0.3);
+  --text: #f0f8ff;
+  --sub: rgba(220,240,255,0.65);
+  --label: rgba(80,200,255,0.85);
+  --card-bg: rgba(10,18,34,0.96);
+  --green: #00c97e;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--void);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* BG — brighter */
+.bg-layer {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 75% 60% at 50% -5%, rgba(255,40,40,0.38) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 55% at 50% -5%, rgba(26,90,255,0.42) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 50% at 15% 60%, rgba(26,90,255,0.25) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 40% at 88% 90%, rgba(0,212,255,0.22) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 85% 10%, rgba(255,40,40,0.12) 0%, transparent 50%),
+    #0a1628;
+}
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.08) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
+}
+canvas#stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+/* NAVBAR */
+.navbar {
+  position: fixed; top: 0; width: 100%; z-index: 200;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 52px; height: 64px;
+  background: rgba(4,9,15,0.75); backdrop-filter: blur(32px);
+  border-bottom: 1px solid var(--border);
+}
+.logo {
+  font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 900;
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; color: white;
+}
+.logo-icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+  box-shadow: 0 0 18px rgba(0,212,255,0.3);
+}
+.logo em { font-style:normal; background:linear-gradient(90deg,#fff,var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+.nav-pill {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--amber);
+  background: rgba(245,158,11,0.09); border: 1px solid rgba(245,158,11,0.22);
+  padding: 6px 14px; border-radius: 100px;
+}
+.nav-pill::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--amber); animation: pillPulse 2s ease-in-out infinite; }
+@keyframes pillPulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+/* MAIN */
+.main {
+  position: relative; z-index: 1; flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 80px 24px 48px;
+}
+
+/* CARD */
+.card {
+  width: 100%; max-width: 440px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 26px; overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(0,212,255,0.03),
+    0 0 0 1px rgba(255,60,60,0.04),
+    0 28px 80px rgba(0,0,0,0.68),
+    0 0 60px rgba(255,40,40,0.04);
+  animation: cardIn .7s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes cardIn { from{opacity:0;transform:translateY(30px) scale(.97)} to{opacity:1;transform:none} }
+
+/* TOP BAND */
+.illus-band {
+  width: 100%; height: 164px;
+  background: linear-gradient(180deg, rgba(255,40,40,0.07) 0%, rgba(26,90,255,0.06) 60%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.illus-band::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgba(255,40,40,0.07), transparent 65%);
+}
+.illus-band::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .35;
+  background-image: radial-gradient(circle, rgba(0,212,255,0.18) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+}
+
+/* SHIELD SVG */
+.shield-svg {
+  position: relative; z-index: 1;
+  filter: drop-shadow(0 0 18px rgba(255,60,60,0.35)) drop-shadow(0 0 36px rgba(26,90,255,0.2));
+  animation: shieldFloat 3s ease-in-out infinite;
+}
+@keyframes shieldFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+
+.ring-wrap {
+  position: absolute; width: 130px; height: 130px;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  animation: ringSpin 10s linear infinite;
+  pointer-events: none; z-index: 0;
+}
+@keyframes ringSpin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+.admin-badge {
+  position: absolute; bottom: 10px; right: 18px;
+  font-size: 10.5px; font-family: 'Syne', sans-serif; font-weight: 800;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--amber);
+  background: rgba(245,158,11,0.09); border: 1px solid rgba(245,158,11,0.22);
+  padding: 3px 10px; border-radius: 100px;
+  animation: badgePulse 2.5s ease-in-out infinite;
+}
+@keyframes badgePulse { 0%,100%{opacity:.6} 50%{opacity:1} }
+
+/* CARD BODY */
+.card-body { padding: 28px 36px 36px; }
+
+.card-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--amber);
+  background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);
+  padding: 4px 11px; border-radius: 100px; margin-bottom: 12px;
+}
+.card-tag::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--amber); flex-shrink:0; }
+
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 25px; font-weight: 900;
+  letter-spacing: -.4px; line-height: 1.2;
+  color: #ffffff; margin-bottom: 6px;
+}
+.card-title em {
+  font-style: normal;
+  background: linear-gradient(90deg, #ff7070, #ffb347);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.card-sub { font-size: 13.5px; color: var(--sub); margin-bottom: 24px; line-height: 1.65; }
+
+/* WARNING STRIP */
+.warn-strip {
+  display: flex; align-items: center; gap: 9px;
+  background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.18);
+  border-radius: 10px; padding: 9px 13px; margin-bottom: 20px;
+  font-size: 12px; color: rgba(253,211,130,0.85); font-weight: 500; line-height: 1.4;
+}
+.warn-strip .wi { font-size: 15px; flex-shrink: 0; }
+
+/* FIELDS */
+.field { margin-bottom: 14px; }
+.field label {
+  display: block; font-size: 11px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--label); margin-bottom: 7px;
+}
+.field input {
+  width: 100%; padding: 12px 16px;
+  background: rgba(4,9,15,0.85);
+  border: 1px solid var(--border); border-radius: 12px;
+  color: #f0f8ff; font-family: 'DM Sans'; font-size: 14px; font-weight: 400;
+  outline: none; transition: all .25s;
+}
+.field input::placeholder { color: rgba(255,255,255,0.18); }
+.field input:focus {
+  border-color: rgba(245,158,11,0.4);
+  background: rgba(245,158,11,0.02);
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.07);
+}
+.pwd-wrap { position: relative; }
+.pwd-wrap input { padding-right: 46px; }
+.eye-btn {
+  position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: rgba(255,255,255,0.25);
+  cursor: pointer; transition: color .2s; padding: 3px; line-height: 1;
+}
+.eye-btn:hover { color: var(--amber); }
+
+/* MSG */
+.msg {
+  min-height: 20px; font-size: 13px; font-weight: 600;
+  margin-top: 4px; display: flex; align-items: center; gap: 6px;
+  border-radius: 10px; padding: 0;
+  transition: all .25s;
+}
+.msg.show {
+  padding: 10px 14px; margin-top: 12px;
+}
+.msg.ok   { background: rgba(0,201,126,0.1);  border: 1px solid rgba(0,201,126,0.22);  color: #7ee8c2; }
+.msg.err  { background: rgba(255,68,68,0.1);   border: 1px solid rgba(255,68,68,0.22);   color: #fca5a5; }
+.msg.info { background: rgba(0,212,255,0.07);  border: 1px solid rgba(0,212,255,0.18);   color: rgba(180,230,255,0.85); }
+
+/* BUTTON */
+.login-btn {
+  width: 100%; padding: 13.5px 20px; border-radius: 13px; border: none;
+  background: linear-gradient(135deg, #c0392b, #e85d04, #f59e0b);
+  background-size: 200% 200%; background-position: 0% 50%;
+  color: white; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 14.5px; letter-spacing: .3px;
+  cursor: pointer; margin-top: 20px;
+  box-shadow: 0 4px 22px rgba(200,60,30,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+  transition: all .3s cubic-bezier(.22,1,.36,1); position: relative; overflow: hidden;
+}
+.login-btn:hover {
+  transform: translateY(-2px); background-position: 100% 50%;
+  box-shadow: 0 8px 34px rgba(245,158,11,0.4);
+}
+.login-btn:active { transform: none; }
+.login-btn .btn-t { position: relative; z-index: 1; }
+.login-btn .spinner {
+  display: none; width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+  border-radius: 50%; animation: spin .7s linear infinite;
+  margin: 0 auto; position: relative; z-index: 1;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.login-btn.loading .btn-t { display: none; }
+.login-btn.loading .spinner { display: block; }
+
+/* BACK LINK */
+.back-link {
+  display: block; text-align: center; margin-top: 20px;
+  padding-top: 20px; border-top: 1px solid var(--border);
+  font-size: 13.5px; color: var(--sub); text-decoration: none;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: color .2s;
+}
+.back-link:hover { color: var(--cyan); }
+
+/* FOOTER */
+footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 18px 52px;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+}
+.footer-logo {
+  font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800;
+  display: flex; align-items: center; gap: 8px; text-decoration: none; color: white;
+}
+.fi { width:24px; height:24px; border-radius:7px; background:linear-gradient(135deg,var(--blue),var(--cyan)); display:flex;align-items:center;justify-content:center;font-size:11px; }
+.footer-logo em { font-style:normal; background:linear-gradient(90deg,#fff,var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.footer-copy { font-size: 11.5px; color: rgba(255,255,255,0.13); }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="bg-grid"></div>
+<canvas id="stars"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="logo">
+    <div class="logo-icon">🛡</div>
+    Job<em>Shield</em>
+  </a>
+  <div class="nav-pill">⚡ Admin Portal</div>
+</nav>
+
+<div class="main">
+  <div class="card">
+
+    <!-- TOP ILLUSTRATION -->
+    <div class="illus-band">
+
+      <!-- rotating dashed ring -->
+      <div class="ring-wrap">
+        <svg width="130" height="130" viewBox="0 0 130 130" fill="none">
+          <circle cx="65" cy="65" r="60" stroke="rgba(245,158,11,0.2)" stroke-width="1" stroke-dasharray="6 5"/>
+          <circle cx="65" cy="65" r="46" stroke="rgba(0,212,255,0.12)" stroke-width="1" stroke-dasharray="3 6"/>
+        </svg>
+      </div>
+
+      <!-- admin shield SVG -->
+      <svg class="shield-svg" width="78" height="90" viewBox="0 0 78 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M39 4L8 16V44C8 62 22 78 39 86C56 78 70 62 70 44V16L39 4Z" fill="url(#shBg)" stroke="url(#shStroke)" stroke-width="1.5"/>
+        <path d="M39 4L8 16V30C8 30 20 27 39 28C58 27 70 30 70 30V16L39 4Z" fill="rgba(255,255,255,0.05)"/>
+        <rect x="29" y="42" width="20" height="16" rx="4" fill="url(#lockFill)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+        <path d="M33 42V37C33 34.2 35 32 39 32C43 32 45 34.2 45 37V42" stroke="url(#lockStroke)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <circle cx="39" cy="50" r="2.5" fill="rgba(255,255,255,0.7)"/>
+        <circle cx="20" cy="24" r="1.5" fill="rgba(0,212,255,0.5)"/>
+        <circle cx="58" cy="28" r="1.5" fill="rgba(245,158,11,0.6)"/>
+        <circle cx="15" cy="52" r="1" fill="rgba(0,212,255,0.4)"/>
+        <circle cx="63" cy="55" r="1" fill="rgba(245,158,11,0.4)"/>
+        <defs>
+          <linearGradient id="shBg" x1="8" y1="4" x2="70" y2="86" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#1c2e60"/>
+            <stop offset="100%" stop-color="#0a1428"/>
+          </linearGradient>
+          <linearGradient id="shStroke" x1="8" y1="4" x2="70" y2="86" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="rgba(245,158,11,0.7)"/>
+            <stop offset="100%" stop-color="rgba(26,90,255,0.4)"/>
+          </linearGradient>
+          <linearGradient id="lockFill" x1="29" y1="42" x2="49" y2="58" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="rgba(245,158,11,0.25)"/>
+            <stop offset="100%" stop-color="rgba(26,90,255,0.2)"/>
+          </linearGradient>
+          <linearGradient id="lockStroke" x1="33" y1="32" x2="45" y2="42" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#f59e0b"/>
+            <stop offset="100%" stop-color="#00d4ff"/>
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <div class="admin-badge">⚡ Admin Only</div>
+    </div>
+
+    <!-- BODY -->
+    <div class="card-body">
+
+      <span class="card-tag">Restricted Access</span>
+      <div class="card-title">Admin <em>Login</em></div>
+      <p class="card-sub">Authorized personnel only. All access attempts are monitored and logged.</p>
+
+      <div class="warn-strip">
+        <span class="wi">⚠️</span>
+        <span>This portal is for system administrators only. Unauthorized access is prohibited.</span>
+      </div>
+
+      <div class="field">
+        <label>Admin Username</label>
+        <input type="text" id="username" placeholder="Enter admin username" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <div class="pwd-wrap">
+          <input type="password" id="password" placeholder="Enter password" autocomplete="off">
+          <button class="eye-btn" onclick="togglePwd()">
+            <svg id="eyeIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="msg" id="msg"></div>
+
+      <button class="login-btn" id="loginBtn" onclick="adminLogin()">
+        <span class="btn-t">🔐 Login as Admin</span>
+        <div class="spinner"></div>
+      </button>
+
+      <a href="index.html" class="back-link">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M8.5 2L3.5 6.5L8.5 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to Home
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="index.html" class="footer-logo">
+    <div class="fi">🛡</div>Job<em>Shield</em>
+  </a>
+  <div class="footer-copy">© 2026 JobShield AI — Restricted Admin Area</div>
+</footer>
+
+<script>
+/* ── STARS ── */
+const cv=document.getElementById("stars"),cx=cv.getContext("2d");let st=[],fs=[];
+function rsz(){cv.width=innerWidth;cv.height=innerHeight;st=[];const n=Math.floor(innerWidth*innerHeight/6500);for(let i=0;i<n;i++){const r=Math.random();st.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.2+.1,a:Math.random(),d:(Math.random()*.004+.002)*(Math.random()<.5?1:-1),c:r<.15?"#ff6060":r<.3?"#f59e0b":r<.48?"#00d4ff":"#ffffff"});}}
+rsz();addEventListener("resize",rsz);
+function spawnFalling(){fs.push({x:Math.random()*cv.width,y:-10,len:Math.random()*60+30,speed:Math.random()*3+2,a:1,ang:Math.PI/5,c:Math.random()<.4?"#ff6060":"#00d4ff"});}
+setInterval(spawnFalling,2000);spawnFalling();
+(function draw(){cx.clearRect(0,0,cv.width,cv.height);for(const s of st){s.a=Math.max(.03,Math.min(1,s.a+s.d));if(s.a<=.03||s.a>=1)s.d*=-1;cx.save();cx.globalAlpha=s.a;if(s.r>1){cx.shadowBlur=s.r*4;cx.shadowColor=s.c;}cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle=s.c;cx.fill();cx.restore();}
+fs=fs.filter(f=>f.a>.02);for(const f of fs){f.x+=Math.cos(f.ang)*f.speed;f.y+=Math.sin(f.ang)*f.speed;f.a-=.014;const tx=f.x-Math.cos(f.ang)*f.len,ty=f.y-Math.sin(f.ang)*f.len;const g=cx.createLinearGradient(tx,ty,f.x,f.y);g.addColorStop(0,"rgba(255,255,255,0)");g.addColorStop(1,`${f.c}${Math.floor(f.a*255).toString(16).padStart(2,'0')}`);cx.save();cx.globalAlpha=f.a;cx.beginPath();cx.moveTo(tx,ty);cx.lineTo(f.x,f.y);cx.strokeStyle=g;cx.lineWidth=1.4;cx.stroke();cx.restore();}
+requestAnimationFrame(draw);})();
+
+/* ── LOGIN ── */
+function setLoading(on){const b=document.getElementById("loginBtn");b.classList.toggle("loading",on);}
+
+function showMsg(text,type){
+  const m=document.getElementById("msg");
+  m.className="msg show "+type;
+  m.textContent=text;
+}
+function clearMsg(){const m=document.getElementById("msg");m.className="msg";m.textContent="";}
+
+document.addEventListener("keydown",e=>{if(e.key==="Enter")adminLogin();});
+
+async function adminLogin(){
+  const username=document.getElementById("username").value.trim();
+  const password=document.getElementById("password").value.trim();
+  if(!username||!password){showMsg("⚠ Please enter both username and password.","err");return;}
+  clearMsg();setLoading(true);
+  showMsg("Authenticating…","info");
+  try{
+    const res=await fetch("http://127.0.0.1:5000/admin/login",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,password})});
+    const data=await res.json();
+    setLoading(false);
+    if(data.status==="success"&&data.role==="admin"){
+      showMsg("✅ Access granted! Redirecting…","ok");
+      localStorage.setItem("username",data.username);
+      setTimeout(()=>window.location.href="admin.html",1000);
+    }else if(data.status==="success"&&data.role!=="admin"){
+      await fetch("http://127.0.0.1:5000/logout",{method:"POST",credentials:"include"});
+      showMsg("❌ Not an admin account!","err");
+    }else{
+      showMsg(data.message||"❌ Invalid credentials!","err");
+    }
+  }catch{
+    setLoading(false);
+    showMsg("❌ Server error — make sure app.py is running!","err");
+  }
+}
+
+/* EYE TOGGLE */
+let pwdVisible=false;
+function togglePwd(){const p=document.getElementById("password");pwdVisible=!pwdVisible;p.type=pwdVisible?"text":"password";document.getElementById("eyeIcon").innerHTML=pwdVisible?`<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>` :`<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;}
+</script>
+</body>
+</html>

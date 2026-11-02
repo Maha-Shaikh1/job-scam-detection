@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobShield Admin | Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --void:#040a14;--blue:#1a5aff;--cyan:#00d4ff;--sky:#38bdf8;
+  --green:#00c97e;--red:#f87171;--amber:#fbbf24;--purple:#a855f7;
+  --border:rgba(0,212,255,0.12);--text:#e8f4ff;--muted:rgba(210,235,255,0.55);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--void);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* SCANLINE OVERLAY */
+body::after{content:"";position:fixed;inset:0;z-index:1000;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,.012) 2px,rgba(0,212,255,.012) 4px)}
+
+/* BG */
+#mesh{position:fixed;inset:0;z-index:0;background:
+  radial-gradient(ellipse 60% 50% at 5% 5%,rgba(26,90,255,0.22) 0%,transparent 55%),
+  radial-gradient(ellipse 50% 40% at 95% 90%,rgba(0,212,255,0.14) 0%,transparent 55%),
+  radial-gradient(ellipse 40% 35% at 50% 50%,rgba(168,85,247,0.06) 0%,transparent 70%),
+  var(--void)}
+#grid{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.018;
+  background-image:linear-gradient(rgba(0,212,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,1) 1px,transparent 1px);
+  background-size:48px 48px}
+canvas#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* NAVBAR */
+.navbar{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:0 48px;height:64px;background:rgba(4,10,20,0.92);backdrop-filter:blur(28px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:900;display:flex;align-items:center;gap:9px;color:white;text-decoration:none}
+.logo-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 0 18px rgba(0,212,255,.45)}
+.logo span{background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-right{display:flex;align-items:center;gap:4px}
+.nav-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;padding:3px 10px;border-radius:6px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--red);letter-spacing:1px;margin-right:8px}
+.nav-link{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;padding:6px 13px;border-radius:8px;transition:.22s}
+.nav-link:hover{color:white;background:rgba(0,212,255,.07)}
+.nav-link.active{color:var(--cyan)}
+.logout-btn{padding:7px 16px;border-radius:9px;border:1px solid rgba(248,113,113,.25);background:rgba(248,113,113,.06);color:var(--red);font-size:13px;cursor:pointer;font-family:'DM Sans';transition:.25s}
+.logout-btn:hover{background:rgba(248,113,113,.15);border-color:var(--red)}
+
+/* MAIN */
+.main{position:relative;z-index:1;padding:32px 48px 60px;max-width:1400px;margin:0 auto}
+
+/* PAGE HEADER */
+.page-header{margin-bottom:32px;animation:rise .7s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.page-tag{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);display:block;margin-bottom:8px;font-family:'JetBrains Mono',monospace}
+.page-title{font-family:'Syne',sans-serif;font-size:clamp(24px,3vw,36px);font-weight:900;letter-spacing:-1.5px}
+.page-title span{background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{
+  background:rgba(8,15,30,0.9);border:1px solid var(--border);border-radius:18px;
+  padding:22px 24px;position:relative;overflow:hidden;
+  animation:rise .7s ease both;transition:.35s;
+}
+.stat-card:hover{border-color:rgba(0,212,255,.28);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,212,255,.1)}
+.stat-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.c1::before{background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.stat-card.c2::before{background:linear-gradient(90deg,var(--red),var(--amber))}
+.stat-card.c3::before{background:linear-gradient(90deg,var(--green),var(--cyan))}
+.stat-card.c4::before{background:linear-gradient(90deg,var(--purple),var(--blue))}
+.stat-label{font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;font-family:'JetBrains Mono',monospace}
+.stat-val{font-family:'Syne',sans-serif;font-size:38px;font-weight:900;line-height:1;margin-bottom:6px}
+.stat-val.c1{background:linear-gradient(135deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-val.c2{background:linear-gradient(135deg,var(--red),var(--amber));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-val.c3{background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-val.c4{background:linear-gradient(135deg,var(--purple),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-sub{font-size:12px;color:var(--muted)}
+
+/* CHARTS ROW */
+.charts-row{display:grid;grid-template-columns:1fr 1.6fr;gap:16px;margin-bottom:28px}
+.chart-card{background:rgba(8,15,30,0.9);border:1px solid var(--border);border-radius:18px;padding:28px;animation:rise .7s .1s ease both}
+.chart-card h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.chart-card h3 span{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--cyan);font-family:'JetBrains Mono',monospace}
+.chart-inner{height:240px;position:relative}
+
+/* BOTTOM ROW */
+.bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.panel{background:rgba(8,15,30,0.9);border:1px solid var(--border);border-radius:18px;padding:28px;animation:rise .7s .2s ease both}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.panel-head h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:800}
+.panel-badge{font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:600;padding:3px 10px;border-radius:6px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--cyan)}
+
+/* USERS TABLE */
+.users-table{width:100%;border-collapse:collapse}
+.users-table th{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:0 8px 12px;text-align:left;font-family:'JetBrains Mono',monospace}
+.users-table td{padding:10px 8px;font-size:13.5px;border-top:1px solid rgba(255,255,255,.04)}
+.users-table tr:hover td{background:rgba(0,212,255,.03)}
+.role-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;font-family:'JetBrains Mono',monospace}
+.role-admin{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--cyan)}
+.role-user{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted)}
+.del-btn{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--red);padding:4px 10px;border-radius:7px;font-size:11.5px;cursor:pointer;transition:.2s;font-family:'DM Sans'}
+.del-btn:hover{background:rgba(248,113,113,.25)}
+
+/* MESSAGES */
+.msg-list{display:flex;flex-direction:column;gap:10px;max-height:320px;overflow-y:auto;padding-right:4px}
+.msg-list::-webkit-scrollbar{width:4px}
+.msg-list::-webkit-scrollbar-track{background:transparent}
+.msg-list::-webkit-scrollbar-thumb{background:rgba(0,212,255,.2);border-radius:4px}
+.msg-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px 14px}
+.msg-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.msg-user{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--cyan)}
+.msg-time{font-size:11px;color:var(--muted)}
+.msg-text{font-size:13px;color:rgba(220,240,255,.75);line-height:1.6}
+
+.loading-row{text-align:center;padding:28px;color:var(--muted);font-size:13px;opacity:.6;font-style:italic}
+
+/* FOOTER */
+.footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.footer-logo{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;display:flex;align-items:center;gap:6px;color:white;text-decoration:none}
+.fi{width:20px;height:20px;border-radius:5px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:9px}
+.footer-logo span{background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.footer-copy{font-size:11px;color:rgba(255,255,255,.14);font-family:'JetBrains Mono',monospace}
+
+@media(max-width:900px){.stats-row{grid-template-columns:1fr 1fr}.charts-row,.bottom-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="mesh"></div><div id="grid"></div><canvas id="stars"></canvas>
+
+<nav class="navbar">
+  <a href="#" class="logo"><div class="logo-icon">🛡</div>Job<span>Shield</span></a>
+  <div class="nav-right">
+    <span class="nav-badge">ADMIN</span>
+    <a href="admin.html" class="nav-link active">Dashboard</a>
+    <a href="admin_reports.html" class="nav-link">Reports</a>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="page-header">
+    <span class="page-tag">// CONTROL PANEL</span>
+    <div class="page-title">Admin <span>Dashboard</span></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card c1" style="animation-delay:.05s">
+      <div class="stat-label">Total Users</div>
+      <div class="stat-val c1" id="totalUsers">—</div>
+      <div class="stat-sub">Registered accounts</div>
+    </div>
+    <div class="stat-card c2" style="animation-delay:.1s">
+      <div class="stat-label">Scam Jobs</div>
+      <div class="stat-val c2" id="totalScam">—</div>
+      <div class="stat-sub">Detected & flagged</div>
+    </div>
+    <div class="stat-card c3" style="animation-delay:.15s">
+      <div class="stat-label">Legit Jobs</div>
+      <div class="stat-val c3" id="totalReal">—</div>
+      <div class="stat-sub">Verified real</div>
+    </div>
+    <div class="stat-card c4" style="animation-delay:.2s">
+      <div class="stat-label">Messages</div>
+      <div class="stat-val c4" id="totalMsgs">—</div>
+      <div class="stat-sub">User reports</div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>Scam vs Legit <span>/ OVERVIEW</span></h3>
+      <div class="chart-inner"><canvas id="donut"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Job Analyses <span>/ BREAKDOWN</span></h3>
+      <div class="chart-inner"><canvas id="bar"></canvas></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM -->
+  <div class="bottom-row">
+    <div class="panel">
+      <div class="panel-head">
+        <h3>👥 Users</h3>
+        <span class="panel-badge" id="userCount">Loading...</span>
+      </div>
+      <table class="users-table">
+        <thead><tr><th>Username</th><th>Role</th><th>Action</th></tr></thead>
+        <tbody id="usersBody"><tr><td colspan="3" class="loading-row">Loading users...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h3>📩 User Messages</h3>
+        <span class="panel-badge" id="msgCount">Loading...</span>
+      </div>
+      <div class="msg-list" id="msgList"><div class="loading-row">Loading messages...</div></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <a href="#" class="footer-logo"><div class="fi">🛡</div>Job<span>Shield</span></a>
+  <div class="footer-copy">// ADMIN PANEL v2.0 — 2026</div>
+</footer>
+
+<script>
+const API="http://127.0.0.1:5000";
+
+/* STARS */
+const cv=document.getElementById("stars"),cx=cv.getContext("2d");let st=[];
+function rsz(){cv.width=innerWidth;cv.height=innerHeight;st=[];const n=Math.floor(innerWidth*innerHeight/6000);for(let i=0;i<n;i++){const r=Math.random();st.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.2+.1,a:Math.random(),d:(Math.random()*.004+.001)*(Math.random()<.5?1:-1),c:r<.18?"#00d4ff":r<.32?"#1a5aff":"#ffffff"});}}
+rsz();addEventListener("resize",rsz);
+(function draw(){cx.clearRect(0,0,cv.width,cv.height);for(const s of st){s.a=Math.max(.03,Math.min(1,s.a+s.d));if(s.a<=.03||s.a>=1)s.d*=-1;cx.save();cx.globalAlpha=s.a;if(s.r>1){cx.shadowBlur=s.r*4;cx.shadowColor=s.c}cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle=s.c;cx.fill();cx.restore();}requestAnimationFrame(draw);})();
+
+/* ADMIN CHECK */
+async function checkAdmin(){
+  try{const r=await fetch(API+"/admin/me",{credentials:"include"});const d=await r.json();if(d.error)window.location.href="admin_login.html";}
+  catch{window.location.href="admin_login.html";}
+}
+
+/* ANALYTICS */
+async function loadAnalytics(){
+  try{
+    const r=await fetch(API+"/admin/analytics",{credentials:"include"});
+    const d=await r.json();
+    document.getElementById("totalScam").textContent=d.scam||0;
+    document.getElementById("totalReal").textContent=d.real||0;
+
+    const chartOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:"rgba(210,235,255,.7)",font:{size:12}}}}};
+
+    new Chart(document.getElementById("donut"),{
+      type:"doughnut",
+      data:{labels:["Scam","Legit"],datasets:[{data:[d.scam||0,d.real||0],backgroundColor:["rgba(248,113,113,.85)","rgba(0,212,255,.85)"],borderColor:["rgba(248,113,113,.3)","rgba(0,212,255,.3)"],borderWidth:1,hoverOffset:8}]},
+      options:{...chartOpts,cutout:"68%",plugins:{...chartOpts.plugins,tooltip:{callbacks:{label:function(c){return ` ${c.label}: ${c.parsed}`;}}}}}
+    });
+
+    new Chart(document.getElementById("bar"),{
+      type:"bar",
+      data:{labels:["Scam Jobs","Legit Jobs"],datasets:[{data:[d.scam||0,d.real||0],backgroundColor:["rgba(248,113,113,.7)","rgba(0,212,255,.7)"],borderRadius:8,borderSkipped:false}]},
+      options:{...chartOpts,scales:{x:{ticks:{color:"rgba(210,235,255,.6)"},grid:{color:"rgba(255,255,255,.04)"}},y:{ticks:{color:"rgba(210,235,255,.6)"},grid:{color:"rgba(255,255,255,.04)"}}}}
+    });
+  }catch(e){console.log(e)}
+}
+
+/* USERS */
+async function loadUsers(){
+  try{
+    const r=await fetch(API+"/admin/users",{credentials:"include"});
+    const users=await r.json();
+    document.getElementById("userCount").textContent=users.length+" total";
+    document.getElementById("totalUsers").textContent=users.length;
+    document.getElementById("usersBody").innerHTML=users.map(u=>`
+      <tr>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:13px">${u.username}</td>
+        <td><span class="role-badge role-${u.role==="admin"?"admin":"user"}">${u.role}</span></td>
+        <td>${u.role!=="admin"?`<button class="del-btn" onclick="deleteUser('${u.username}')">Delete</button>`:`<span style="font-size:11px;color:var(--muted)">Protected</span>`}</td>
+      </tr>`).join("");
+  }catch(e){document.getElementById("usersBody").innerHTML='<tr><td colspan="3" class="loading-row">Error loading users</td></tr>';}
+}
+
+async function deleteUser(username){
+  if(!confirm(`Delete user "${username}"?`))return;
+  await fetch(API+"/admin/delete-user/"+username,{method:"DELETE",credentials:"include"});
+  loadUsers();
+}
+
+/* MESSAGES */
+async function loadMessages(){
+  try{
+    const r=await fetch(API+"/admin/messages",{credentials:"include"});
+    const msgs=await r.json();
+    document.getElementById("msgCount").textContent=msgs.length+" messages";
+    document.getElementById("totalMsgs").textContent=msgs.length;
+    document.getElementById("msgList").innerHTML=msgs.length?msgs.map(m=>`
+      <div class="msg-item">
+        <div class="msg-meta">
+          <span class="msg-user">${m.username}</span>
+          <span class="msg-time">${m.time||m.created_at||""}</span>
+        </div>
+        <div class="msg-text">${m.message}</div>
+      </div>`).join(""):`<div class="loading-row">No messages yet.</div>`;
+  }catch(e){document.getElementById("msgList").innerHTML='<div class="loading-row">Error loading messages.</div>';}
+}
+
+/* LOGOUT */
+async function logout(){await fetch(API+"/logout",{method:"POST",credentials:"include"});window.location.href="admin_login.html";}
+
+/* INIT */
+(async()=>{await checkAdmin();loadUsers();loadAnalytics();loadMessages();})();
+</script>
+</body>
+</html>

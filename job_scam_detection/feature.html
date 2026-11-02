@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Features | JobShield AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+<style>
+
+:root {
+  --void:  #0a1628;
+  --blue:  #1a5aff;
+  --cyan:  #00d4ff;
+  --sky:   #38bdf8;
+  --border: rgba(0,212,255,0.13);
+  --text:  #e8f4ff;
+  --muted: rgba(210,235,255,0.82);
+}
+
+html { scroll-behavior:smooth; }
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family:'Outfit',sans-serif;
+  background:var(--void);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* ── BG ── */
+#mesh {
+  position:fixed; inset:0; z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 20%, rgba(26,90,255,0.3) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at 85% 15%, rgba(0,212,255,0.22) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 50% 90%, rgba(26,90,255,0.18) 0%, transparent 60%),
+    var(--void);
+  animation:meshDrift 20s ease-in-out infinite alternate;
+}
+@keyframes meshDrift{ 0%{filter:hue-rotate(0deg)} 100%{filter:hue-rotate(15deg)} }
+
+#grid {
+  position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.02;
+  background-image:linear-gradient(rgba(0,212,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,1) 1px,transparent 1px);
+  background-size:55px 55px;
+}
+#starCanvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+/* ══ NAVBAR ══ */
+.navbar {
+  position:fixed; top:0; width:100%; z-index:200;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:0 60px; height:68px;
+  background:rgba(10,22,40,0.75);
+  backdrop-filter:blur(28px);
+  border-bottom:1px solid var(--border);
+  transition:.4s;
+}
+.navbar.scrolled { background:rgba(10,22,40,0.96); box-shadow:0 8px 40px rgba(0,212,255,0.08); }
+.logo { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; display:flex; align-items:center; gap:9px; }
+.logo-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--blue),var(--cyan)); display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 0 20px rgba(0,212,255,.35); }
+.logo-txt span { background:linear-gradient(90deg,var(--blue),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.nav-links { display:flex; align-items:center; gap:2px; }
+.nav-links a { color:rgba(220,240,255,0.85); text-decoration:none; font-size:13.5px; font-weight:500; padding:6px 14px; border-radius:8px; transition:.22s; }
+.nav-links a:hover { color:white; background:rgba(0,212,255,0.08); }
+.nav-links a.active { color:var(--cyan); }
+.nav-login { padding:8px 22px; border-radius:10px; background:linear-gradient(135deg,var(--blue),var(--cyan)); color:white !important; font-weight:600 !important; font-size:13.5px !important; box-shadow:0 0 22px rgba(0,212,255,0.3); transition:.3s; text-decoration:none; font-family:'Outfit'; }
+.nav-login:hover { transform:translateY(-1px); box-shadow:0 4px 28px rgba(0,212,255,0.5); }
+
+/* ══ SPLIT HERO ══ */
+.split-hero {
+  position:relative; z-index:1;
+  display:grid; grid-template-columns:1fr 1fr;
+  min-height:100vh;
+}
+@media(max-width:768px){ .split-hero{ grid-template-columns:1fr; } }
+
+.split-left {
+  padding:120px 60px 60px;
+  display:flex; flex-direction:column; justify-content:center;
+  border-right:1px solid var(--border);
+  position:relative;
+}
+.split-left::after {
+  content:""; position:absolute; right:0; top:20%; bottom:20%;
+  width:1px;
+  background:linear-gradient(180deg,transparent,var(--cyan),var(--blue),transparent);
+  opacity:.5;
+}
+
+.split-right {
+  padding:120px 60px 60px;
+  display:flex; flex-direction:column; justify-content:center; align-items:flex-start;
+  gap:20px;
+}
+
+.page-tag {
+  font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase;
+  color:var(--cyan); margin-bottom:16px;
+  display:flex; align-items:center; gap:8px;
+}
+.page-tag::before { content:""; width:20px; height:2px; background:var(--cyan); border-radius:2px; display:block; }
+
+.split-left h1 {
+  font-family:'Syne',sans-serif;
+  font-size:clamp(38px,5vw,62px); font-weight:800;
+  line-height:1.05; letter-spacing:-2px;
+  margin-bottom:24px;
+  animation:fadeUp .7s ease both;
+}
+.split-left h1 .grad {
+  background:linear-gradient(100deg,var(--cyan),var(--sky),#fff);
+  background-size:200%;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  animation:shimmer 5s linear infinite;
+}
+@keyframes shimmer{ 0%{background-position:0%} 100%{background-position:200%} }
+
+.split-left p { color:var(--muted); font-size:15.5px; line-height:1.8; margin-bottom:36px; max-width:420px; animation:fadeUp .7s .15s ease both; }
+
+.split-actions { display:flex; gap:12px; flex-wrap:wrap; animation:fadeUp .7s .25s ease both; }
+
+.btn-glow {
+  padding:13px 28px; border-radius:12px; border:none;
+  background:linear-gradient(135deg,var(--blue),var(--cyan)); background-size:200%;
+  color:white; font-weight:700; font-size:15px;
+  cursor:pointer; font-family:'Outfit';
+  box-shadow:0 0 28px rgba(0,212,255,0.35); transition:.35s;
+}
+.btn-glow:hover { transform:translateY(-3px); background-position:right; box-shadow:0 8px 40px rgba(0,212,255,0.55); }
+
+.btn-ghost {
+  padding:12px 24px; border-radius:12px;
+  border:1px solid rgba(0,212,255,0.25); background:rgba(0,212,255,0.06);
+  color:var(--text); font-weight:500; font-size:15px;
+  cursor:pointer; font-family:'Outfit'; text-decoration:none;
+  display:inline-flex; align-items:center; transition:.3s;
+}
+.btn-ghost:hover { border-color:rgba(0,212,255,.6); background:rgba(0,212,255,.1); transform:translateY(-2px); }
+
+/* Right side — number pills */
+.num-pills { width:100%; }
+.num-pill {
+  display:flex; align-items:center; gap:18px;
+  padding:18px 24px; border-radius:16px;
+  background:rgba(13,28,55,0.85);
+  border:1px solid var(--border);
+  margin-bottom:12px;
+  opacity:0; transform:translateX(24px); transition:.4s;
+  backdrop-filter:blur(12px);
+  position:relative; overflow:hidden;
+}
+.num-pill::before {
+  content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:linear-gradient(180deg,var(--blue),var(--cyan));
+  border-radius:3px 0 0 3px;
+}
+.num-pill.show { opacity:1; transform:translateX(0); }
+.num-pill:hover { border-color:rgba(0,212,255,.35); transform:translateX(4px); }
+.pill-num {
+  font-family:'Syne',sans-serif; font-size:28px; font-weight:800;
+  background:linear-gradient(135deg,var(--cyan),var(--sky));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  min-width:60px; text-align:center; flex-shrink:0;
+}
+.pill-divider { width:1px; height:40px; background:var(--border); flex-shrink:0; }
+.pill-content h4 { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; margin-bottom:4px; }
+.pill-content p { font-size:12.5px; color:var(--muted); }
+
+@keyframes fadeUp{ from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+
+/* ══ TIMELINE SECTION ══ */
+.timeline-section {
+  position:relative; z-index:1;
+  padding:100px 60px;
+  background:rgba(13,28,55,0.4);
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+}
+
+.tl-header { text-align:center; margin-bottom:70px; }
+.section-tag {
+  font-size:11px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  margin-bottom:12px; display:block;
+}
+.tl-header h2 { font-family:'Syne',sans-serif; font-size:clamp(28px,3.5vw,42px); font-weight:800; letter-spacing:-1px; margin-bottom:12px; }
+.tl-header p { color:var(--muted); font-size:15px; max-width:480px; margin:0 auto; line-height:1.7; }
+
+.timeline {
+  position:relative; max-width:900px; margin:0 auto;
+}
+.timeline::before {
+  content:""; position:absolute; left:50%; transform:translateX(-50%);
+  top:0; bottom:0; width:2px;
+  background:linear-gradient(180deg,transparent,var(--blue),var(--cyan),var(--blue),transparent);
+}
+@media(max-width:700px){ .timeline::before{ left:20px; } }
+
+.tl-item {
+  display:grid; grid-template-columns:1fr 60px 1fr;
+  gap:0; margin-bottom:50px; align-items:center;
+  opacity:0; transform:translateY(24px); transition:.45s;
+}
+.tl-item.show { opacity:1; transform:translateY(0); }
+.tl-item:last-child { margin-bottom:0; }
+@media(max-width:700px){ .tl-item{ grid-template-columns:60px 1fr; } }
+
+.tl-card {
+  background:rgba(13,28,55,0.9);
+  border:1px solid var(--border);
+  border-radius:18px; padding:26px;
+  backdrop-filter:blur(14px);
+  transition:.3s;
+}
+.tl-card:hover { border-color:rgba(0,212,255,.4); box-shadow:0 8px 32px rgba(0,212,255,.12); transform:translateY(-3px); }
+.tl-card.right { grid-column:3; }
+.tl-card.left  { grid-column:1; }
+.tl-card-empty { grid-column:1; }
+.tl-card-empty-right { grid-column:3; }
+@media(max-width:700px){
+  .tl-card.right,.tl-card.left { grid-column:2; }
+  .tl-card-empty,.tl-card-empty-right { display:none; }
+}
+
+.tl-icon-wrap {
+  width:42px; height:42px; border-radius:12px;
+  background:linear-gradient(135deg,rgba(26,90,255,.25),rgba(0,212,255,.18));
+  border:1px solid rgba(0,212,255,.25);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; margin-bottom:14px;
+}
+.tl-card h3 { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; margin-bottom:8px; color:#fff; }
+.tl-card p { font-size:13px; color:var(--muted); line-height:1.65; }
+.tl-badge { display:inline-block; margin-top:12px; padding:3px 10px; border-radius:6px; background:rgba(0,212,255,.1); border:1px solid rgba(0,212,255,.2); font-size:10.5px; font-weight:600; color:var(--cyan); letter-spacing:.5px; }
+
+.tl-dot {
+  display:flex; align-items:center; justify-content:center;
+  grid-column:2; z-index:1;
+}
+.tl-dot-inner {
+  width:18px; height:18px; border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  box-shadow:0 0 16px rgba(0,212,255,.6);
+  border:3px solid var(--void);
+}
+
+/* ══ MARQUEE STRIP ══ */
+.marquee-wrap {
+  position:relative; z-index:1;
+  padding:24px 0; overflow:hidden;
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+  background:rgba(10,22,40,0.6);
+}
+.marquee-track {
+  display:flex; gap:0;
+  animation:marquee 22s linear infinite;
+  width:max-content;
+}
+.marquee-track:hover { animation-play-state:paused; }
+@keyframes marquee{ 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.marquee-item {
+  display:flex; align-items:center; gap:10px;
+  padding:0 32px; white-space:nowrap;
+  font-size:13px; font-weight:600; color:var(--muted);
+  border-right:1px solid var(--border);
+}
+.marquee-item span { color:var(--cyan); font-size:16px; }
+
+/* ══ COMPARISON TABLE ══ */
+.compare-section {
+  position:relative; z-index:1;
+  padding:100px 60px;
+}
+.compare-header { margin-bottom:50px; }
+.compare-header h2 { font-family:'Syne',sans-serif; font-size:clamp(26px,3.5vw,40px); font-weight:800; letter-spacing:-1px; margin-bottom:10px; }
+.compare-header p { color:var(--muted); font-size:15px; line-height:1.7; }
+
+.compare-table {
+  width:100%; border-collapse:separate; border-spacing:0;
+  background:rgba(13,28,55,0.85);
+  border:1px solid var(--border); border-radius:20px; overflow:hidden;
+  opacity:0; transform:translateY(22px); transition:.5s;
+  backdrop-filter:blur(14px);
+}
+.compare-table.show { opacity:1; transform:translateY(0); }
+
+.compare-table thead th {
+  padding:20px 28px; text-align:left;
+  font-family:'Syne',sans-serif; font-size:13px; font-weight:700;
+  letter-spacing:.5px; border-bottom:1px solid var(--border);
+}
+.compare-table thead th:first-child { color:var(--muted); font-weight:500; }
+.compare-table thead th.col-them { color:rgba(210,235,255,0.5); }
+.compare-table thead th.col-us {
+  background:linear-gradient(135deg,rgba(26,90,255,.15),rgba(0,212,255,.1));
+  color:var(--cyan);
+  border-left:1px solid rgba(0,212,255,.2);
+  border-right:1px solid rgba(0,212,255,.2);
+}
+
+.compare-table tbody tr { border-bottom:1px solid var(--border); transition:.25s; }
+.compare-table tbody tr:last-child { border-bottom:none; }
+.compare-table tbody tr:hover { background:rgba(0,212,255,0.04); }
+
+.compare-table tbody td {
+  padding:18px 28px; font-size:14px; color:var(--muted);
+  vertical-align:middle;
+}
+.compare-table tbody td:first-child { color:white; font-weight:500; }
+.compare-table tbody td.col-us {
+  background:linear-gradient(135deg,rgba(26,90,255,.08),rgba(0,212,255,.05));
+  border-left:1px solid rgba(0,212,255,.15);
+  border-right:1px solid rgba(0,212,255,.15);
+  text-align:center;
+}
+.compare-table tbody td.col-them { text-align:center; }
+
+.check { color:#4ade80; font-size:18px; }
+.cross { color:rgba(255,100,100,0.6); font-size:18px; }
+.partial { color:#fbbf24; font-size:13px; font-weight:600; }
+
+/* ══ FAQ ACCORDION ══ */
+.faq-section {
+  position:relative; z-index:1;
+  padding:100px 60px;
+  background:rgba(13,28,55,0.35);
+  border-top:1px solid var(--border);
+}
+.faq-wrap { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:start; }
+@media(max-width:768px){ .faq-wrap{ grid-template-columns:1fr; } }
+
+.faq-left h2 { font-family:'Syne',sans-serif; font-size:clamp(26px,3vw,38px); font-weight:800; letter-spacing:-1px; margin-bottom:14px; }
+.faq-left h2 em { font-style:normal; background:linear-gradient(90deg,var(--cyan),var(--sky)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.faq-left p { color:var(--muted); font-size:15px; line-height:1.8; margin-bottom:28px; }
+
+.faq-list { }
+.faq-item {
+  border-bottom:1px solid var(--border);
+  opacity:0; transform:translateY(16px); transition:.4s;
+}
+.faq-item.show { opacity:1; transform:translateY(0); }
+.faq-item:last-child { border-bottom:none; }
+
+.faq-q {
+  padding:18px 0; cursor:pointer;
+  display:flex; justify-content:space-between; align-items:center; gap:16px;
+  font-size:15px; font-weight:600; color:#fff;
+  transition:.25s; user-select:none;
+}
+.faq-q:hover { color:var(--cyan); }
+.faq-arrow {
+  width:28px; height:28px; border-radius:8px; flex-shrink:0;
+  background:rgba(0,212,255,.08); border:1px solid rgba(0,212,255,.2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; transition:.3s; color:var(--cyan);
+}
+.faq-item.open .faq-arrow { transform:rotate(180deg); background:rgba(0,212,255,.15); }
+.faq-a {
+  max-height:0; overflow:hidden; transition:.35s ease;
+  color:var(--muted); font-size:14px; line-height:1.75;
+}
+.faq-item.open .faq-a { max-height:200px; padding-bottom:18px; }
+
+/* ══ CTA ══ */
+.cta-section { text-align:center; padding:100px 60px; position:relative; z-index:1; }
+.cta-inner {
+  max-width:720px; margin:0 auto;
+  background:rgba(10,22,40,0.78);
+  border:1px solid rgba(0,212,255,.2);
+  border-radius:28px; padding:75px 60px;
+  position:relative; overflow:hidden;
+  opacity:0; transform:translateY(26px); transition:.55s;
+  backdrop-filter:blur(24px);
+}
+.cta-inner.show { opacity:1; transform:translateY(0); }
+.cta-inner::before {
+  content:""; position:absolute; inset:-1px; border-radius:29px; z-index:-1;
+  background:linear-gradient(135deg,rgba(26,90,255,.4),rgba(0,212,255,.35),rgba(56,189,248,.25));
+  opacity:.3; animation:borderGlow 4s ease-in-out infinite alternate;
+}
+@keyframes borderGlow{ 0%{opacity:.15} 100%{opacity:.5} }
+.cta-inner::after {
+  content:""; position:absolute; width:320px; height:320px; border-radius:50%;
+  background:radial-gradient(circle,rgba(0,212,255,.1),transparent 70%);
+  top:-120px; right:-80px; pointer-events:none;
+}
+.cta-inner h2 { font-family:'Syne',sans-serif; font-size:clamp(26px,4vw,42px); font-weight:800; letter-spacing:-1.2px; margin-bottom:14px; line-height:1.1; position:relative; z-index:1; }
+.cta-inner h2 em { font-style:normal; background:linear-gradient(100deg,var(--cyan),var(--sky),#fff); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 4s linear infinite; }
+.cta-inner p { color:rgba(210,235,255,0.88); font-size:15.5px; margin-bottom:32px; line-height:1.7; position:relative; z-index:1; }
+.cta-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; position:relative; z-index:1; }
+
+/* ══ FOOTER ══ */
+.footer {
+  position:relative; z-index:1; padding:28px 60px;
+  border-top:1px solid var(--border);
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;
+}
+.footer-logo { font-family:'Syne',sans-serif; font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px; }
+.footer-logo-icon { width:26px; height:26px; border-radius:7px; background:linear-gradient(135deg,var(--blue),var(--cyan)); display:flex; align-items:center; justify-content:center; font-size:12px; }
+.footer-logo span { background:linear-gradient(90deg,var(--blue),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.footer-copy { font-size:12px; color:rgba(255,255,255,.25); }
+
+</style>
+</head>
+<body>
+
+<div id="mesh"></div>
+<div id="grid"></div>
+<canvas id="starCanvas"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="logo">
+    <div class="logo-icon">🛡</div>
+    <span class="logo-txt">Job<span>Shield</span></span>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="feature.html" class="active">Features</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="guidelines.html">Safety Guide</a>
+    <a href="resume-tips.html">Resume Tips</a>
+  </div>
+  <a href="login.html" class="nav-login">Login →</a>
+</nav>
+
+<!-- SPLIT HERO -->
+<section class="split-hero">
+  <div class="split-left">
+    <div class="page-tag">Platform Features</div>
+    <h1>What Makes<br>JobShield <span class="grad">Different?</span></h1>
+    <p>Not just a keyword checker — a full behavioral fraud intelligence system built specifically for the job market.</p>
+    <div class="split-actions">
+      <button class="btn-glow" onclick="location.href='register.html'">⚡ Try It Free</button>
+      <a href="index.html" class="btn-ghost">⬅ Home</a>
+    </div>
+  </div>
+<div class="split-right">
+  <div class="num-pills" id="pillsWrap">
+
+    <div class="num-pill">
+      <div class="pill-num">AI</div>
+      <div class="pill-divider"></div>
+      <div class="pill-content">
+        <h4>Smart AI Detection</h4>
+        <p>Machine learning model analyzes job posts for scam patterns</p>
+      </div>
+    </div>
+
+    <div class="num-pill">
+      <div class="pill-num">ML</div>
+      <div class="pill-divider"></div>
+      <div class="pill-content">
+        <h4>Advanced ML Model</h4>
+        <p>Trained on real job datasets to detect fraudulent recruitment</p>
+      </div>
+    </div>
+
+    <div class="num-pill">
+      <div class="pill-num">OCR</div>
+      <div class="pill-divider"></div>
+      <div class="pill-content">
+        <h4>Image & PDF Analysis</h4>
+        <p>Extracts text from screenshots and offer letters automatically</p>
+      </div>
+    </div>
+
+    <div class="num-pill">
+      <div class="pill-num">SAFE</div>
+      <div class="pill-divider"></div>
+      <div class="pill-content">
+        <h4>Secure Job Checking</h4>
+        <p>Helps job seekers verify opportunities before applying</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item"><span>🧬</span> Recruiter DNA Analysis</div>
+    <div class="marquee-item"><span>🗺️</span> Red Flag Heatmap</div>
+    <div class="marquee-item"><span>📸</span> WhatsApp Scan</div>
+    <div class="marquee-item"><span>📊</span> Confidence Scoring</div>
+    <div class="marquee-item"><span>🏆</span> Scam Awareness Quiz</div>
+    <div class="marquee-item"><span>🔐</span> Secure Dashboard</div>
+    <div class="marquee-item"><span>🖼️</span> PDF OCR Engine</div>
+    <div class="marquee-item"><span>⚡</span> Real-Time Detection</div>
+    <div class="marquee-item"><span>🧬</span> Recruiter DNA Analysis</div>
+    <div class="marquee-item"><span>🗺️</span> Red Flag Heatmap</div>
+    <div class="marquee-item"><span>📸</span> WhatsApp Scan</div>
+    <div class="marquee-item"><span>📊</span> Confidence Scoring</div>
+    <div class="marquee-item"><span>🏆</span> Scam Awareness Quiz</div>
+    <div class="marquee-item"><span>🔐</span> Secure Dashboard</div>
+    <div class="marquee-item"><span>🖼️</span> PDF OCR Engine</div>
+    <div class="marquee-item"><span>⚡</span> Real-Time Detection</div>
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<section class="timeline-section">
+  <div class="tl-header">
+    <span class="section-tag">How It Protects You</span>
+    <h2>Every Feature, Explained</h2>
+    <p>From the moment you paste a job post to the final verdict — here's what happens under the hood.</p>
+  </div>
+
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-card left">
+        <div class="tl-icon-wrap">🧬</div>
+        <h3>Recruiter DNA Analysis</h3>
+        <p>Analyzes writing tone, urgency tactics, and behavioral patterns that scammers unknowingly leave behind — beyond just keywords.</p>
+        <span class="tl-badge">Behavioral AI</span>
+      </div>
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-card-empty-right"></div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-card-empty"></div>
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-card right">
+        <div class="tl-icon-wrap">🗺️</div>
+        <h3>Red Flag Heatmap</h3>
+        <p>See exactly which sentences triggered the scam alert — color-coded directly inside the job text so you know precisely what's suspicious.</p>
+        <span class="tl-badge">Visual Intel</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-card left">
+        <div class="tl-icon-wrap">📸</div>
+        <h3>WhatsApp Screenshot Scan</h3>
+        <p>Got a suspicious job offer on WhatsApp? Screenshot it, upload it. OCR extracts the text and runs full ML analysis instantly.</p>
+        <span class="tl-badge">OCR Engine</span>
+      </div>
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-card-empty-right"></div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-card-empty"></div>
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-card right">
+        <div class="tl-icon-wrap">📊</div>
+        <h3>Confidence Score Breakdown</h3>
+        <p>Not just a yes/no — a precise percentage with a breakdown of every signal detected, categorized by risk severity.</p>
+        <span class="tl-badge">ML Scoring</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-card left">
+        <div class="tl-icon-wrap">🏆</div>
+        <h3>Scam Awareness Quiz</h3>
+        <p>10 real-world scam scenarios with instant feedback and a personal safety score — train yourself to spot fraud independently.</p>
+        <span class="tl-badge">Interactive</span>
+      </div>
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-card-empty-right"></div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-card-empty"></div>
+      <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+      <div class="tl-card right">
+        <div class="tl-icon-wrap">📋</div>
+        <h3>Smart Scan History</h3>
+        <p>Every scan saved to your dashboard with timestamps and risk scores. Re-analyze old postings anytime with the latest model updates.</p>
+        <span class="tl-badge">Dashboard</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- COMPARISON TABLE -->
+<section class="compare-section">
+  <div class="compare-header">
+    <span class="section-tag">Why Choose Us</span>
+    <h2>JobShield vs The Rest</h2>
+    <p>See how JobShield stacks up against generic tools and manual checking.</p>
+  </div>
+
+  <table class="compare-table" id="compareTable">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th class="col-them">Generic Tools</th>
+        <th class="col-us">🛡 JobShield</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Keyword-based scam detection</td>
+        <td class="col-them"><span class="check">✓</span></td>
+        <td class="col-us"><span class="check">✓</span></td>
+      </tr>
+      <tr>
+        <td>Behavioral / tone analysis</td>
+        <td class="col-them"><span class="cross">✗</span></td>
+        <td class="col-us"><span class="check">✓</span></td>
+      </tr>
+      <tr>
+        <td>WhatsApp screenshot scanning</td>
+        <td class="col-them"><span class="cross">✗</span></td>
+        <td class="col-us"><span class="check">✓</span></td>
+      </tr>
+      <tr>
+        <td>Red flag heatmap visualization</td>
+        <td class="col-them"><span class="cross">✗</span></td>
+        <td class="col-us"><span class="check">✓</span></td>
+      </tr>
+      <tr>
+        <td>Confidence percentage score</td>
+        <td class="col-them"><span class="partial">Partial</span></td>
+        <td class="col-us"><span class="check">✓</span></td>
+      </tr>
+      <tr>
+        <td>India-specific scam patterns</td>
+        <td class="col-them"><span class="cross">✗</span></td>
+        <td class="col-us"><span class="check">✓</span></td>
+      </tr>
+      <tr>
+        <td>100% Free to use</td>
+        <td class="col-them"><span class="cross">✗</span></td>
+        <td class="col-us"><span class="check">✓</span></td>
+      </tr>
+      <tr>
+        <td>Scam awareness training quiz</td>
+        <td class="col-them"><span class="cross">✗</span></td>
+        <td class="col-us"><span class="check">✓</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="faq-wrap">
+    <div class="faq-left">
+      <span class="section-tag">Got Questions?</span>
+      <h2>Frequently<br><em>Asked</em></h2>
+      <p>Everything you need to know about how JobShield works and what it can do for you.</p>
+      <button class="btn-glow" onclick="location.href='register.html'" style="margin-top:8px;">Start Analyzing Free →</button>
+    </div>
+
+    <div class="faq-list" id="faqList">
+
+     <div class="faq-item">
+  <div class="faq-q">How does JobShield detect job scams? <div class="faq-arrow">▾</div></div>
+  <div class="faq-a">JobShield uses machine learning and natural language processing to analyze job descriptions, recruiter messages, and other recruitment content. The system looks for suspicious keywords, unrealistic salary promises, payment requests, and patterns commonly used in fraudulent job postings.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">Can I analyze WhatsApp messages or screenshots? <div class="faq-arrow">▾</div></div>
+  <div class="faq-a">Yes. JobShield supports screenshot and document scanning. Using an OCR engine, the system extracts text from images or PDF files and then performs the same AI-based analysis used for normal text input.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">What signs usually indicate a fake job posting? <div class="faq-arrow">▾</div></div>
+  <div class="faq-a">Common warning signs include requests for registration fees, extremely high salaries for simple work, urgent hiring pressure, incomplete company details, and communication through unofficial channels such as random WhatsApp numbers.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">Does the system provide a confidence score? <div class="faq-arrow">▾</div></div>
+  <div class="faq-a">Yes. After analyzing the job content, JobShield provides a prediction result along with a confidence percentage. This helps users understand how strongly the system believes the job posting is legitimate or suspicious.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">Who can benefit from using JobShield AI? <div class="faq-arrow">▾</div></div>
+  <div class="faq-a">JobShield AI is designed for students, fresh graduates, and job seekers who want to verify job opportunities before applying. It helps users avoid recruitment scams and make safer decisions while searching for jobs online.</div>
+</div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-inner" id="ctaInner">
+    <h2>Ready to Use<br><em>Every Feature?</em></h2>
+    <p>Register free and get instant access to all JobShield tools — scam detection, OCR scanning, quiz, and your personal dashboard.</p>
+    <div class="cta-btns">
+      <button class="btn-glow" onclick="location.href='register.html'">⚡ Register Free</button>
+      <a href="guidelines.html" class="btn-ghost">📖 Safety Guide</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">
+    <div class="footer-logo-icon">🛡</div>
+    Job<span>Shield</span>
+  </div>
+  <div class="footer-copy">© 2026 JobShield AI — Recruitment Fraud Protection</div>
+</footer>
+
+<script>
+/* STARS */
+const canvas=document.getElementById("starCanvas"),ctx=canvas.getContext("2d");
+let stars=[];
+function resize(){
+  canvas.width=innerWidth; canvas.height=innerHeight; stars=[];
+  const n=Math.floor(innerWidth*innerHeight/6000);
+  for(let i=0;i<n;i++){
+    const r=Math.random();
+    stars.push({ x:Math.random()*innerWidth, y:Math.random()*innerHeight, r:Math.random()*1.3+.15, a:Math.random(), d:(Math.random()*.005+.002)*(Math.random()<.5?1:-1), c:r<.2?"#00d4ff":r<.38?"#1a5aff":r<.48?"#38bdf8":"#ffffff" });
+  }
+}
+resize(); addEventListener("resize",resize);
+(function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(const s of stars){
+    s.a=Math.max(.04,Math.min(1,s.a+s.d));
+    if(s.a<=.04||s.a>=1)s.d*=-1;
+    ctx.save(); ctx.globalAlpha=s.a;
+    if(s.r>1){ctx.shadowBlur=s.r*5;ctx.shadowColor=s.c;}
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=s.c; ctx.fill(); ctx.restore();
+  }
+  requestAnimationFrame(draw);
+})();
+
+/* NAVBAR */
+addEventListener("scroll",()=>{
+  document.getElementById("navbar").classList.toggle("scrolled",scrollY>50);
+});
+
+/* REVEAL */
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) setTimeout(()=>e.target.classList.add("show"),+e.target.dataset.delay||0); });
+},{threshold:.1});
+
+document.querySelectorAll(".num-pill").forEach((el,i)=>{ el.dataset.delay=i*100; obs.observe(el); });
+document.querySelectorAll(".tl-item").forEach((el,i)=>{ el.dataset.delay=i*120; obs.observe(el); });
+document.querySelectorAll(".faq-item").forEach((el,i)=>{ el.dataset.delay=i*80; obs.observe(el); });
+document.querySelectorAll("#compareTable,#ctaInner").forEach(el=>obs.observe(el));
+
+/* FAQ ACCORDION */
+document.querySelectorAll(".faq-q").forEach(q=>{
+  q.addEventListener("click",()=>{
+    const item=q.parentElement;
+    const wasOpen=item.classList.contains("open");
+    document.querySelectorAll(".faq-item").forEach(i=>i.classList.remove("open"));
+    if(!wasOpen) item.classList.add("open");
+  });
+});
+</script>
+</body>
+</html>
